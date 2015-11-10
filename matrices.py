@@ -57,7 +57,7 @@ def V_nuclear(basis,N,R,Zn,Rn):
 
 def H_core(basis,N,R,Z):
     """
-    Compute core Hamiltonian matrix
+    Compute core Hamiltonian matrix.
 
     BASIS: Contraction coefficients of the STO-NG basis set.
     N: Number of electrons (dimensions of the matrix).
@@ -65,12 +65,79 @@ def H_core(basis,N,R,Z):
     Z: Nuclear charges
     """
 
-    H_core = T_kinetic(basis,N,R)
+    H = T_kinetic(basis,N,R)
 
     for r,z in zip(R,Z):
-        H_core += V_nuclear(basis,N,R,z,r)
+        H += V_nuclear(basis,N,R,z,r)
 
-    return H_core
+    return H
+
+def P_density(C,N):
+    """
+    Compute dansity matrix.
+
+    C: coefficients matrix.
+    N: Number of electrons (dimensions of the matrix).
+    """
+
+    P = np.zeros((N,N))
+
+    for i in range(N):
+        for j in range(N):
+            for k in range(int(N/2)): #TODO Only for RHF
+                P[i,j] += 2 * C[i,k] * C[j,k].conjugate()
+
+    return P
+
+def EE_list(basis,N,R):
+    """
+    Multidimensional array of two-electron integrals.
+    """
+
+    EE = np.zeros((N,N,N,N))
+
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                for l in range(N):
+                    for a in basis[i]:
+                        for b in basis[j]:
+                            for c in basis[k]:
+                                for d in basis[l]:
+                                    f = a[0].conjugate() * b[0].conjugate() * c[0] * d[0]
+                                    EE[i,j,k,l] += f * electronic_ss(a[1],b[1],c[1],d[1],R[i],R[j],R[k],R[l])
+
+    return EE
+
+def print_EE_list(ee):
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                for l in range(N):
+                    print("({0},{1},{2},{3})  {4}".format(i+1,j+1,k+1,l+1,ee[i,j,k,l]))
+
+def G_ee(basis,N,R,Z,P,ee):
+    """
+    Compute core Hamiltonian matrix.
+
+    BASIS: Contraction coefficients of the STO-NG basis set.
+    N: Number of electrons (dimensions of the matrix).
+    R: Nuclear positions
+    Z: Nuclear charges
+    P: density matrix.
+    EE: Two-electron integrals
+    """
+
+    G = np.zeros((N,N))
+
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                for l in range(N):
+                    G[i,j] += P[k,l] * (ee[i,j,k,l]  - 0.5 * ee[i,k,l,j])
+
+    return G
+
 
 
 if __name__ == "__main__":
@@ -134,3 +201,6 @@ if __name__ == "__main__":
 
     print("\nCore Hamiltonian:")
     print(H_core(STO3G,N,R,Z))
+
+    print("\nTwo-electron integrals:")
+    print_EE_list(EE_list(STO3G,N,R))
