@@ -1,5 +1,7 @@
 from integrals import *
 
+import numpy.linalg as la
+
 def S_overlap(basis,N,R):
     """
     Compute overlap matrix.
@@ -17,6 +19,21 @@ def S_overlap(basis,N,R):
                     S[i,j] += c[0].conjugate()*d[0] * overlap_ss(c[1],d[1],R[i],R[j])
 
     return S
+
+def X_transform(S):
+    """
+    Compute the transformation matrix X using canonical orthogonalization.
+
+    S: Overlap matrix.
+    """
+
+    s, U = la.eig(S)
+
+    s = np.diag(np.sqrt(1./s))
+
+    X = np.dot(U,s)
+
+    return X
 
 def T_kinetic(basis,N,R):
     """
@@ -170,6 +187,9 @@ if __name__ == "__main__":
     print("\nCore Hamiltonian:")
     print(H_core(STO3G,N,R,Z))
 
+    print("\nTransformation matrix X:")
+    print(X_transform(S_overlap(STO3G,N,R)))
+
     z1 = 2.0925 # He
     z2 = 1.24 # H
 
@@ -201,6 +221,9 @@ if __name__ == "__main__":
 
     print("\nCore Hamiltonian:")
     print(H_core(STO3G,N,R,Z))
+
+    print("\nTransformation matrix X:")
+    print(X_transform(S_overlap(STO3G,N,R)))
 
     print("\nTwo-electron integrals:")
     print_EE_list(EE_list(STO3G,N,R))
