@@ -29,7 +29,7 @@ def X_transform(S):
 
     s, U = la.eig(S)
 
-    s = np.diag(np.sqrt(1./s))
+    s = np.diag(s**(-1./2.))
 
     X = np.dot(U,s)
 
@@ -106,33 +106,6 @@ def P_density(C,N):
 
     return P
 
-def EE_list(basis,N,R):
-    """
-    Multidimensional array of two-electron integrals.
-    """
-
-    EE = np.zeros((N,N,N,N))
-
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
-                for l in range(N):
-                    for a in basis[i]:
-                        for b in basis[j]:
-                            for c in basis[k]:
-                                for d in basis[l]:
-                                    f = a[0].conjugate() * b[0].conjugate() * c[0] * d[0]
-                                    EE[i,j,k,l] += f * electronic_ss(a[1],b[1],c[1],d[1],R[i],R[j],R[k],R[l])
-
-    return EE
-
-def print_EE_list(ee):
-    for i in range(N):
-        for j in range(N):
-            for k in range(N):
-                for l in range(N):
-                    print("({0},{1},{2},{3})  {4}".format(i+1,j+1,k+1,l+1,ee[i,j,k,l]))
-
 def G_ee(basis,N,R,Z,P,ee):
     """
     Compute core Hamiltonian matrix.
@@ -151,7 +124,7 @@ def G_ee(basis,N,R,Z,P,ee):
         for j in range(N):
             for k in range(N):
                 for l in range(N):
-                    G[i,j] += P[k,l] * (ee[i,j,k,l]  - 0.5 * ee[i,k,l,j])
+                    G[i,j] += P[k,l] * (ee[i,j,k,l]  - 0.5 * ee[i,l,k,j])
 
     return G
 
@@ -187,9 +160,6 @@ if __name__ == "__main__":
     print("\nCore Hamiltonian:")
     print(H_core(STO3G,N,R,Z))
 
-    print("\nTransformation matrix X:")
-    print(X_transform(S_overlap(STO3G,N,R)))
-
     z1 = 2.0925 # He
     z2 = 1.24 # H
 
@@ -221,9 +191,3 @@ if __name__ == "__main__":
 
     print("\nCore Hamiltonian:")
     print(H_core(STO3G,N,R,Z))
-
-    print("\nTransformation matrix X:")
-    print(X_transform(S_overlap(STO3G,N,R)))
-
-    print("\nTwo-electron integrals:")
-    print_EE_list(EE_list(STO3G,N,R))

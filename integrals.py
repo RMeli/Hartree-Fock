@@ -52,9 +52,53 @@ def electronic_ss(aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     return e
 
+def EE_list(basis,N,R):
+    """
+    Multidimensional array of two-electron integrals.
+    """
+
+    EE = np.zeros((N,N,N,N))
+
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                for l in range(N):
+                    for a in basis[i]:
+                        for b in basis[j]:
+                            for c in basis[k]:
+                                for d in basis[l]:
+                                    f = a[0].conjugate() * b[0].conjugate() * c[0] * d[0]
+                                    EE[i,j,k,l] += f * electronic_ss(a[1],b[1],c[1],d[1],R[i],R[j],R[k],R[l])
+
+    return EE
+
+def print_EE_list(ee,N):
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                for l in range(N):
+                    print("({0},{1},{2},{3})  {4}".format(i+1,j+1,k+1,l+1,ee[i,j,k,l]))
+
 def F_ss(t,cutoff=1e-6):
     if abs(t) < cutoff:
         return 1. - t / 3.
     else:
         # Eq. A.32
         return 0.5 * np.sqrt(np.pi / t) * spec.erf(np.sqrt(t))
+
+if __name__ == "__main__":
+    z1 = 2.0925 # He
+    z2 = 1.24 # H
+
+    # Basis set
+    STO3G = [[(0.444635,0.109818*z1**2),(0.535328,0.405771*z1**2),(0.154329,2.22766*z1**2)],
+        [(0.444635,0.109818*z2**2),(0.535328,0.405771*z2**2),(0.154329,2.22766*z2**2)]]
+
+    N = 2 # Number of electrons
+
+    Z = (2,1) # Atomic charges
+
+    R = (0.0,1.4632) # Atomic positions
+
+    print("\nTwo-electron integrals:")
+    print_EE_list(EE_list(STO3G,N,R),N)
