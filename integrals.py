@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.special as spec
+import scipy.misc as msc
 
 def gaussian_product(aa,bb,Ra,Rb):
 
@@ -95,9 +96,7 @@ if __name__ == "__main__":
         [(0.444635,0.109818*z2**2),(0.535328,0.405771*z2**2),(0.154329,2.22766*z2**2)]]
 
     N = 2 # Number of electrons
-
     Z = (2,1) # Atomic charges
-
     R = (0.0,1.4632) # Atomic positions
 
     print("\nTwo-electron integrals:")
