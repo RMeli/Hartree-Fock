@@ -40,7 +40,7 @@ def Sxyz(a,b,aa,bb,Ra,Rb,R):
 
                 S += tmp
 
-    return np.sqrt(np.pi / (aa+bb)) * S
+    return S
 
 def overlap(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     """
@@ -63,6 +63,7 @@ def overlap(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     S *= Sxyz(ay,by,aa,bb,Ra[1],Rb[1],R[1]) # Sy
     S *= Sxyz(az,bz,aa,bb,Ra[2],Rb[2],R[2]) # Sz
     S *= Na * Nb * c # Eab and normalization
+    S *= (np.pi / (aa+bb))**(3./2.)
 
     return S
 
@@ -80,14 +81,15 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     R,c = gaussian_product(aa,bb,Ra,Rb)
 
     def Kxyz(ac,a1,a2,bc,b1,b2,aa,bb,Ra,Rb,Ra1,Rb1,Ra2,Rb2,Rc,R1,R2):
-
-        kc = ac * bc * Sxyz(ac-1,bc-1,aa,bb,Ra,Rb,Rc)
+        kc = 0
+        kc += ac * bc * Sxyz(ac-1,bc-1,aa,bb,Ra,Rb,Rc)
         kc += -2 * aa * bc * Sxyz(ac+1,bc-1,aa,bb,Ra,Rb,Rc)
         kc += -2 * ac * bb * Sxyz(ac-1,bc+1,aa,bb,Ra,Rb,Rc)
         kc += 4 * aa * bb * Sxyz(ac+1,bc+1,aa,bb,Ra,Rb,Rc)
         kc *= 0.5
 
-        Kc = c * (np.pi / (aa+bb))**(3./2.) * kc
+        Kc = 1
+        Kc *= c * (np.pi / (aa+bb))**(3./2.) * kc
         Kc *= Sxyz(a1,b1,aa,bb,Ra1,Rb1,R1)
         Kc *= Sxyz(a2,b2,aa,bb,Ra2,Rb2,R2)
 
@@ -100,4 +102,6 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     Na = norm(ax,ay,az,aa)
     Nb = norm(bx,by,bz,bb)
 
-    return (Kx + Ky + Kz)  * Na * Nb
+    K = (Kx + Ky + Kz) * Na * Nb
+
+    return K

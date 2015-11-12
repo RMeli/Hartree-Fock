@@ -126,7 +126,15 @@ if __name__ == "__main__":
     """
 
     # HeH+
-    #atoms = [Atom("H",(0,0,0),["1s"]),Atom("He",(0,0,1.4),["1s"])]
+    atoms = [Atom("H",(0,0,0),["1s"]),Atom("He",(0,0,1.4),["1s"])]
+
+    # Create the basis set
+    sto3g = STO3G(atoms)
+
+    # Display informations
+    sto3g.info()
+
+    print("\n\n\n\n\n")
 
     # H2O
     atoms = [   Atom("H",(0,+1.43233673,-0.96104039),["1s"]),
