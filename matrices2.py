@@ -97,7 +97,24 @@ if __name__ == "__main__":
     print(T_H2)
 
     # HeH+
-    HeH = [Atom("H",(0,0,0),["1s"]),Atom("He",(0,0,1.4),["1s"])]
+    HeH = [Atom("H",(0,0,0),["1s"]),Atom("He",(0,0,1.4632),["1s"])]
+
+    # Create the basis set
+    sto3g_HeH = STO3G(HeH)
+
+    # Overlap matrix
+    S_HeH = S_overlap(sto3g_HeH)
+    T_HeH = T_kinetic(sto3g_HeH)
+
+    print("############")
+    print("HeH molecule")
+    print("############")
+
+    print("\nOverlap matrix S:")
+    print(S_HeH)
+
+    print("\nKinetic matrix T:")
+    print(T_HeH)
 
     # H2O
     H2O = [   Atom("H",(0,+1.43233673,-0.96104039),["1s"]),
