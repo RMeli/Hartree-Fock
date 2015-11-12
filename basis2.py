@@ -87,6 +87,9 @@ class STO3G():
 
             self.K = len(self.STO3G)
 
+    def basis(self):
+        return self.STO3G
+
     def info(self):
         print("########################")
         print("STO-3G MINIMAL BASIS SET")
@@ -108,10 +111,18 @@ if __name__ == "__main__":
     """
     Results compared with
 
+        Modern Quantum Chemistry
+        Szabo and Ostlund
+        Dover
+        1989
+
+    and
+
         The Mathematica Journal
         Evaluation of Gaussian Molecular Integrals
         I. Overlap Integrals
         Minhhuy Hô and Julio Manuel Hernández-Pérez
+        2012
     """
 
     # HeH+
