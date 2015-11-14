@@ -94,6 +94,19 @@ def V_nuclear(basis,atom):
 
     return Vn
 
+def H_core(basis,molecule):
+    T = T_kinetic(basis)
+
+    # Size of the basis set
+    K = basis.K
+
+    Vn = np.zeros((K,K))
+
+    for atom in molecule:
+        Vn += V_nuclear(basis,atom)
+
+    return T + Vn
+
 if __name__ == "__main__":
 
     """
@@ -111,6 +124,22 @@ if __name__ == "__main__":
         I. Overlap Integrals
         Minhhuy Hô and Julio Manuel Hernández-Pérez
         2012
+
+    and
+
+        The Mathematica Journal
+        Evaluation of Gaussian Molecular Integrals
+        II. Kinetic-Energy Integrals
+        Minhhuy Hô and Julio Manuel Hernández-Pérez
+        2013
+
+    and
+
+        The Mathematica Journal
+        Evaluation of Gaussian Molecular Integrals
+        III. Nuclear-Electron attraction Integrals
+        Minhhuy Hô and Julio Manuel Hernández-Pérez
+        2014
     """
 
     # H2
@@ -119,11 +148,12 @@ if __name__ == "__main__":
     # Create the basis set
     sto3g_H2 = STO3G(H2)
 
-    # Overlap matrix
+    # Compute matrices
     S_H2 = S_overlap(sto3g_H2)
     T_H2 = T_kinetic(sto3g_H2)
     Vn1_H2 = V_nuclear(sto3g_H2,H2[0])
     Vn2_H2 = V_nuclear(sto3g_H2,H2[1])
+    H_core_H2 = H_core(sto3g_H2,H2)
 
     print("###########")
     print("H2 molecule")
@@ -141,17 +171,21 @@ if __name__ == "__main__":
     print("\nElectron-nucleus interaction " + H2[1].name + " :")
     print(Vn2_H2)
 
+    print("\nCore Hamiltonian:")
+    print(H_core_H2)
+
     # HeH+
     HeH = [Atom("H",(0,0,0),1,["1s"]),Atom("He",(0,0,1.4632),2,["1s"])]
 
     # Create the basis set
     sto3g_HeH = STO3G(HeH)
 
-    # Overlap matrix
+    # Compute matrices
     S_HeH = S_overlap(sto3g_HeH)
     T_HeH = T_kinetic(sto3g_HeH)
     Vn1_HeH = V_nuclear(sto3g_HeH,HeH[0])
     Vn2_HeH = V_nuclear(sto3g_HeH,HeH[1])
+    H_core_HeH = H_core(sto3g_HeH,HeH)
 
     print("\n\n\n")
     print("############")
@@ -170,6 +204,9 @@ if __name__ == "__main__":
     print("\nElectron-nucleus interaction " + HeH[1].name + " :")
     print(Vn2_HeH)
 
+    print("\nCore Hamiltonian:")
+    print(H_core_HeH)
+
     # H2O
     H2O = [   Atom("H",(0,+1.43233673,-0.96104039),1,["1s"]),
                 Atom("H",(0,-1.43233673,-0.96104039),1,["1s"]),
@@ -186,6 +223,8 @@ if __name__ == "__main__":
 
     Vn_H2O = Vn1_H2O + Vn2_H2O + Vn3_H2O
 
+    H_core_H2O = H_core(sto3g_H2O,H2O)
+
     print("\n\n\n")
     print("############")
     print("H2O molecule")
@@ -199,3 +238,6 @@ if __name__ == "__main__":
 
     print("\nTotal electron-nucleus interaction:")
     print(Vn_H2O)
+
+    print("\nCore hamiltonian:")
+    print(H_core_H2O)
