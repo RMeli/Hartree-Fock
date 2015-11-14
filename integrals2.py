@@ -1,6 +1,6 @@
 import numpy as np
-import scipy.special as spec
 import scipy.misc as misc
+import scipy.integrate as quad
 
 def gaussian_product(aa,bb,Ra,Rb):
 
@@ -74,7 +74,7 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     Source:
         The Mathematica Journal
         Evaluation of Gaussian Molecular Integrals
-        I. Kinetic-Energy Integrals
+        II. Kinetic-Energy Integrals
         Minhhuy Hô and Julio Manuel Hernández-Pérez
     """
 
@@ -105,3 +105,86 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     K = (Kx + Ky + Kz) * Na * Nb
 
     return K
+
+def f(j,l,m,a,b):
+    """
+    Expansion coefficient.
+
+    Source:
+
+    """
+
+    f = 0
+
+    for k in range(max(0,j-m),min(j,l)+1):
+        tmp = 1
+        tmp *= misc.comb(l,k,exact=True)
+        tmp *= misc.comb(m,j-k,exact=True)
+        tmp *= a**(l-k)
+        tmp *= b**(m+k-j)
+
+        f += tmp
+
+    return f
+
+def F(nu,x,dt=1e-3):
+
+    def f(t):
+        return t**(2*nu) * np.exp(-x*t**2)
+
+    F = quad.quad(f,0,1)[0]
+
+    return F
+
+def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
+    Vn = 0
+
+    g = aa + bb
+    eps = 1. / (4 * g)
+
+    Rp,c = gaussian_product(aa,bb,Ra,Rb)
+
+    def A(l,r,i,l1,l2,Ra,Rb,Rc,Rp):
+        A = 1
+        A *= (-1)**(l)
+        A *= f(l,l1,l2,Rp-Ra,Rp-Rb)
+        A *= (-1)**i
+        A *= misc.factorial(l,exact=True)
+        A *= (Rp-Rc)**(l-2*r-2*i)
+        A *= eps**(r+i)
+        A /= misc.factorial(r,exact=True)
+        A /= misc.factorial(i,exact=True)
+        A /= misc.factorial(l-2*r-2*i,exact=True)
+
+        return A
+
+    for l in range(0,ax+bx+1):
+        for r in range(0,int(l/2)+1):
+            for i in range(0,int((l-2*r)/2)+1):
+                A1 = A(l,r,i,ax,bx,Ra[0],Rb[0],Rn[0],Rp[0])
+
+                for m in range(0,ay+by+1):
+                    for s in range(0,int(m/2)+1):
+                        for j in range(0,int((m-2*s)/2)+1):
+                            A2 = A(m,s,j,ay,by,Ra[1],Rb[1],Rn[1],Rp[1])
+
+                            for n in range(0,az+bz+1):
+                                for t in range(0,int(n/2)+1):
+                                    for k in range(0,int((n-2*t)/2)+1):
+                                        A3 =  A(n,t,k,az,bz,Ra[2],Rb[2],Rn[2],Rp[2])
+
+                                        nu = l + m + n - 2 * (r + s + t) - (i + j + k)
+
+                                        ff = F(nu,g*np.dot(Rp-Rn,Rp-Rn))
+
+                                        Vn += A1 * A2 * A3 * ff
+
+    Na = norm(ax,ay,az,aa)
+    Nb = norm(bx,by,bz,bb)
+
+    Vn *= - Zn * Na * Nb * c * 2 * np.pi / g
+
+    return Vn
+
+def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
+    pass
