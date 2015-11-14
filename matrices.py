@@ -12,6 +12,8 @@ def S_overlap(basis,N,R):
     """
     S = np.zeros((N,N))
 
+
+
     for i in range(N):
         for j in range(N):
             for c in basis[i]:

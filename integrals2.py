@@ -2,6 +2,8 @@ import numpy as np
 import scipy.misc as misc
 import scipy.integrate as quad
 
+from basis2 import *
+
 def gaussian_product(aa,bb,Ra,Rb):
 
     Ra = np.asarray(Ra)
@@ -161,23 +163,23 @@ def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
     for l in range(0,ax+bx+1):
         for r in range(0,int(l/2)+1):
             for i in range(0,int((l-2*r)/2)+1):
-                A1 = A(l,r,i,ax,bx,Ra[0],Rb[0],Rn[0],Rp[0])
+                Ax = A(l,r,i,ax,bx,Ra[0],Rb[0],Rn[0],Rp[0])
 
                 for m in range(0,ay+by+1):
                     for s in range(0,int(m/2)+1):
                         for j in range(0,int((m-2*s)/2)+1):
-                            A2 = A(m,s,j,ay,by,Ra[1],Rb[1],Rn[1],Rp[1])
+                            Ay = A(m,s,j,ay,by,Ra[1],Rb[1],Rn[1],Rp[1])
 
                             for n in range(0,az+bz+1):
                                 for t in range(0,int(n/2)+1):
                                     for k in range(0,int((n-2*t)/2)+1):
-                                        A3 =  A(n,t,k,az,bz,Ra[2],Rb[2],Rn[2],Rp[2])
+                                        Az =  A(n,t,k,az,bz,Ra[2],Rb[2],Rn[2],Rp[2])
 
                                         nu = l + m + n - 2 * (r + s + t) - (i + j + k)
 
                                         ff = F(nu,g*np.dot(Rp-Rn,Rp-Rn))
 
-                                        Vn += A1 * A2 * A3 * ff
+                                        Vn += Ax * Ay * Az * ff
 
     Na = norm(ax,ay,az,aa)
     Nb = norm(bx,by,bz,bb)
@@ -186,5 +188,161 @@ def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
 
     return Vn
 
+
 def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
-    pass
+
+    G = 0
+
+    g1 = aa + bb
+    g2 = cc + dd
+
+    Rp, c1 = gaussian_product(aa,bb,Ra,Rb)
+    Rq, c2 = gaussian_product(cc,dd,Rc,Rd)
+
+    delta = 1 / (4 * g1) + 1 / (4 * g2)
+
+    def theta(l,l1,l2,a,b,r,g):
+        t = 1
+        t *= f(l,l1,l2,a,b)
+        t *= misc.factorial(l,exact=True)
+        t *= g**(r-l)
+        t /= misc.factorial(r,exact=True)
+        t /= misc.factorial(l-2*r,exact=True)
+
+        return t
+
+
+    def B(l,ll,r,rr,i,l1,l2,Ra,Rb,Rp,g1,l3,l4,Rc,Rd,Rq,g2):
+        b = 1
+        b *= (-1)**ll * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
+        b *= theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2)
+        b *= (-1)**i * (2*delta)**(2*(r+rr))
+        b *= misc.factorial(l + ll - 2*r - 2*rr,exact=True)
+        b *= delta**i * (Rp-Rq)**(l+ll-2*(r+rr+i))
+        b /= (4*delta)**(l+ll) * misc.factorial(i,exact=True)
+        b /= misc.factorial(l+ll-2*(r+rr+i),exact=True)
+
+        return b
+
+    for l in range(0,ax+bx+1):
+        for r in range(0,int(l/2)+1):
+            for i in range(0,int((l-2*r)/2)+1):
+                for ll in range(0,cx+dx+1):
+                    for rr in range(0,int(ll/2)+1):
+                        Bx = B(l,ll,r,rr,i,ax,bx,Ra[0],Rb[0],Rp[0],g1,cx,dx,Rc[0],Rd[0],Rq[0],g2)
+
+                        for m in range(0,ay+by+1):
+                            for s in range(0,int(m/2)+1):
+                                for j in range(0,int((m-2*s)/2)+1):
+                                    for mm in range(0,cy+dy+1):
+                                        for ss in range(0,int(mm/2)+1):
+                                            By = B(m,mm,s,ss,j,ay,by,Ra[1],Rb[1],Rp[1],g1,cy,dy,Rc[1],Rd[1],Rq[1],g2)
+
+                                            for n in range(0,az+bz+1):
+                                                for t in range(0,int(n/2)+1):
+                                                    for k in range(0,int((n-2*t)/2)+1):
+                                                        for nn in range(0,cz+dz+1):
+                                                            for tt in range(0,int(nn/2)+1):
+                                                                Bz = B(n,nn,t,tt,k,az,bz,Ra[2],Rb[2],Rp[2],g1,cz,dz,Rc[2],Rd[2],Rq[2],g2)
+
+                                                                nu = l + ll + m + mm + n + nn - 2 * (r+rr+s+ss+t+tt) - (i + j + k)
+
+                                                                ff = F(nu,np.dot(Rp-Rq,Rp-Rq)/(4*delta))
+
+                                                                G += Bx * By * Bz * ff
+
+
+
+    Na = norm(ax,ay,az,aa)
+    Nb = norm(bx,by,bz,bb)
+    Nc = norm(cx,cy,cz,cc)
+    Nd = norm(dx,dy,dz,dd)
+
+    G *= Na * Nb * Nc * Nd * c1 * c2 * 2 * np.pi**2 / (g1 * g2) * np.sqrt(np.pi / (g1 + g2))
+
+    return G
+
+def EE_list(basis):
+    """
+    Multidimensional array of two-electron integrals.
+    """
+
+    # Size of the basis set
+    K = basis.K
+
+    # List of basis functions
+    B = basis.basis()
+
+    EE = np.zeros((K,K,K,K))
+
+    for i,b1 in enumerate(B):
+        for j,b2 in enumerate(B):
+            for k,b3 in enumerate(B):
+                for l,b4 in enumerate(B):
+                    for a1,d1 in zip(b1["a"],b1["d"]):
+                        for a2,d2 in zip(b2["a"],b2["d"]):
+                            for a3,d3 in zip(b3["a"],b3["d"]):
+                                for a4,d4 in zip(b4["a"],b4["d"]):
+                                    R1 = b1["R"]
+                                    R2 = b2["R"]
+                                    R3 = b3["R"]
+                                    R4 = b4["R"]
+
+                                    ax = b1["lx"]
+                                    ay = b1["ly"]
+                                    az = b1["lz"]
+
+                                    bx = b2["lx"]
+                                    by = b2["ly"]
+                                    bz = b2["lz"]
+
+                                    cx = b3["lx"]
+                                    cy = b3["ly"]
+                                    cz = b3["lz"]
+
+                                    dx = b4["lx"]
+                                    dy = b4["ly"]
+                                    dz = b4["lz"]
+
+                                    tmp = 1
+                                    tmp *= d1.conjugate()*d2.conjugate()
+                                    tmp *= d3 * d4
+                                    tmp *= electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,a1,a2,a3,a4,R1,R2,R3,R4)
+
+                                    EE[i,j,k,l] += tmp
+
+    return EE
+
+def print_EE_list(ee):
+
+    K = ee.shape[0]
+
+    for i in range(K):
+        for j in range(K):
+            for k in range(K):
+                for l in range(K):
+                    print("({0},{1},{2},{3})  {4}".format(i+1,j+1,k+1,l+1,ee[i,j,k,l]))
+
+if __name__ == "__main__":
+
+    """
+    Results compared with
+
+        Modern Quantum Chemistry
+        Szabo and Ostlund
+        Dover
+        1989
+    """
+
+    HeH = [Atom("He",(0,0,1.4632),2,["1s"]),Atom("H",(0,0,0),1,["1s"])]
+
+    sto3g_HeH = STO3G(HeH)
+
+    ee_HeH = EE_list(sto3g_HeH)
+
+    print("######################")
+    print("Two electron integrals")
+    print("######################")
+
+    print("\n HeH")
+    print_EE_list(ee_HeH)
