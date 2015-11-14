@@ -1,8 +1,9 @@
 class Atom:
-    def __init__(self,name,R,orbitals):
+    def __init__(self,name,R,Z,orbitals):
         self.name = name
         self.R = R
         self.orbitals = orbitals
+        self.Z = Z
 
 class STO3G():
     def __init__(self,atoms):
