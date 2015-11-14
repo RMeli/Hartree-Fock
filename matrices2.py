@@ -29,6 +29,21 @@ def S_overlap(basis):
 
     return S
 
+def X_transform(S):
+    """
+    Compute the transformation matrix X using canonical orthogonalization.
+
+    S: Overlap matrix.
+    """
+
+    s, U = la.eig(S)
+
+    s = np.diag(s**(-1./2.))
+
+    X = np.dot(U,s)
+
+    return X
+
 def T_kinetic(basis):
     """
     Compute kinetic matrix T.
@@ -106,6 +121,48 @@ def H_core(basis,molecule):
         Vn += V_nuclear(basis,atom)
 
     return T + Vn
+
+def P_density(C,N):
+    """
+    Compute dansity matrix.
+
+    C: Coefficients matrix.
+    """
+
+    # Size of the basis set
+    K = C.shape[0]
+
+    P = np.zeros((K,K))
+
+    for i in range(K):
+        for j in range(K):
+            for k in range(int(N/2)): #TODO Only for RHF
+                P[i,j] += 2 * C[i,k] * C[j,k].conjugate()
+
+    return P
+
+def G_ee(basis,molecule,P,ee):
+    """
+    Compute core Hamiltonian matrix.
+
+    BASIS: Basis set.
+    MOLECULE: Collection of atoms
+    P: Density matrix
+    EE: Two-electron integrals
+    """
+
+    # Size of the basis set
+    K = basis.k
+
+    G = np.zeros((K,K))
+
+    for i in range(K):
+        for j in range(K):
+            for k in range(K):
+                for l in range(K):
+                    G[i,j] += P[k,l] * (ee[i,j,k,l]  - 0.5 * ee[i,l,k,j])
+
+    return G
 
 if __name__ == "__main__":
 
