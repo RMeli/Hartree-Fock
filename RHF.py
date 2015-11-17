@@ -1,4 +1,4 @@
-from matrices2 import *
+from matrices import *
 
 import numpy.linalg as la
 

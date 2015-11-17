@@ -1,8 +1,8 @@
 from RHF import *
 
-from matrices2 import *
-from integrals2 import *
-from basis2 import *
+from matrices import *
+from integrals import *
+from basis import *
 from molecules import *
 
 import numpy as np

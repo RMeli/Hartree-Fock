@@ -1,5 +1,5 @@
-from basis2 import *
-from integrals2 import *
+from basis import *
+from integrals import *
 
 import numpy.linalg as la
 
