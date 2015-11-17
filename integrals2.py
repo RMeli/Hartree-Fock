@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.misc as misc
+import scipy.special as spec
 import scipy.integrate as quad
 
 from basis2 import *
@@ -129,14 +130,15 @@ def f(j,l,m,a,b):
 
     return f
 
-def F(nu,x,dt=1e-3):
+def F(nu,x):
 
     def f(t):
         return t**(2*nu) * np.exp(-x*t**2)
 
-    F = quad.quad(f,0,1)[0]
+    F = quad.quad(f,0,1,epsabs=1e-12,epsrel=1e-12,limit=500)[0]
 
     return F
+
 
 def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
     Vn = 0
@@ -262,6 +264,103 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     return G
 
+"""
+
+def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
+
+    G = 0
+
+    gp = aa + bb
+    gq = cc + dd
+
+    Rp, Cp = gaussian_product(aa,bb,Ra,Rb)
+    Rq, Cq = gaussian_product(cc,dd,Rc,Rd)
+
+    etap = aa * bb / gp
+    etaq = cc * dd / gq
+
+    eta = etap * etaq / (etap + etaq)
+
+    def J(l1,l2,l3,l4,Ra,Rb,Rc,Rd,Rp,Rq):
+
+        def T(i1,i2,o1,o2,r1,aa,bb,Ra,Rb):
+            T = 1
+            T *= (-1)**(o2+r1)
+            T *= misc.factorial(o1+o2,exact=True)
+            T /= 4**(i1+i2+r1)
+            T /= misc.factorial(i1,exact=True)
+            T /= misc.factorial(i2,exact=True)
+            T /= misc.factorial(o1,exact=True)
+            T /= misc.factorial(o2,exact=True)
+            T /= misc.factorial(r1,exact=True)
+            T *= aa**(o2-i1-r1)
+            T *= bb**(o1-i2-r1)
+            T *= etap**(2*(i1+i2)+r1)
+            T *= (Ra-Rb)**(o1+o2-2*r1)
+            T /= misc.factorial(l1-2*i1-o1,exact=True)
+            T /= misc.factorial(l2-2*i2-o2,exact=True)
+            T /= misc.factorial(o1+o2-2*r1,exact=True)
+            T *= misc.factorial(l3,exact=True)
+            T *= misc.factorial(l4,exact=True)
+            T /= etaq**(l3+l4)
+
+        J = 1
+        J *= (-1)**(l1+l2)
+        J *= misc.factorial(l1,exact=True)
+        J *= misc.factorial(l2,exact=True)
+        J /= etap**(l1+l2)
+        J *= misc.factorial(l3,exact=True)
+        J *= misc.factorial(l4,exact=True)
+        J /= etaq**(l3+l4)
+
+        SUM = 0
+
+        for i1 in range(0,int(l1/2)+1):
+            for i2 in range(0,int(l2/2)+1):
+                for o1 in range(0,l1-2*i1+1):
+                    for o2 in range(0,l2-2*i2+1):
+                        for r1 in range(0,int((o1+o2)/2)+1)):
+                            T1 = T(i1,i2,o1,o2,r1,aa,bb,Ra,Rb)
+
+                            for i3 in range(0,int(l3/2)+1):
+                                for i4 in range(0,int(l4/2)+1):
+                                    for o3 in range(0,l3-2*i3+1):
+                                        for o4 in range(0,l4-2*i4+1):
+                                            for r2 in range(0,int((o3+o4)/2)+1):
+                                                T2 = T(i3,i4,o3,o4,r2,cc,dd,Rc,Rd)
+
+                                                mu = l1 + l2 + l3 + l4 - 2*(i1+i2+i3+i4) -(o1+o2+o3+o4)
+
+                                                    for u in range(0,int(mu/2)+1):
+                                                        T3 = 1
+                                                        T3 *= (-1)**u
+                                                        T3 *= misc.factorial(mu,exact=True)
+                                                        T3 *= eta**(mu-u)
+                                                        T3 *= (Rp-Rq)**(mu-2*u)
+                                                        T3 /= 4**u * misc.factorial(u,exact=True)
+                                                        T3 /= misc.factorial(mu-2*u,exact=True)
+
+                                                        SUM += T1*T2*T3
+
+        J *= SUM
+
+        return J
+
+    Na = norm(ax,ay,az,aa)
+    Nb = norm(bx,by,bz,bb)
+    Nc = norm(cx,cy,cz,cc)
+    Nd = norm(dx,dy,dz,dd)
+
+    G = 1
+    G *= J(ax,bx,cx,dx,Ra[0],Rb[0],Rc[0],Rd[0],Rp[0],Rq[0])
+    G *= J(ay,by,cy,dy,Ra[1],Rb[1],Rc[1],Rd[1],Rp[1],Rq[1])
+    G *= J(az,bz,cz,dz,Ra[2],Rb[2],Rc[2],Rd[2],Rp[2],Rq[2])
+    G *= 2* F
+    G *= Na*Nb*Nc*Nd * np.pi**(5./2.) / (gp * gq * np.sqrt(gp+gq)) * Cp * Cq
+"""
+
+
+
 def EE_list(basis):
     """
     Multidimensional array of two-electron integrals.
@@ -275,10 +374,19 @@ def EE_list(basis):
 
     EE = np.zeros((K,K,K,K))
 
+    Nee= 0
+
     for i,b1 in enumerate(B):
         for j,b2 in enumerate(B):
             for k,b3 in enumerate(B):
                 for l,b4 in enumerate(B):
+
+                    Nee += 1
+
+                    if Nee % 500 == 0:
+                        print("     Computed ", Nee, " two-electron integrals of ", K**4, ".",sep='')
+
+
                     for a1,d1 in zip(b1["a"],b1["d"]):
                         for a2,d2 in zip(b2["a"],b2["d"]):
                             for a3,d3 in zip(b3["a"],b3["d"]):
