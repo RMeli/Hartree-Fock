@@ -8,19 +8,38 @@ class Atom:
 class STO3G():
     def __init__(self,atoms):
 
+        """
+        Source
+
+            Modern Quantum Chemistry
+            Szabo and Ostlund
+            Dover
+            1989
+        """
+
         self.zeta1 = {  "H":1.24,
                         "He":2.0925,
+                        "Li":2.69,
+                        "Be":3.68,
+                        "B":4.68,
                         "C":5.67,
-                        "O":7.66}
-        self.zeta2 = {  "C":1.72,
-                        "O":2.25}
+                        "N":6.67,
+                        "O":7.66,
+                        "F":8.65}
+        self.zeta2 = {  "Li":0.75,
+                        "Be":1.10,
+                        "B":1.45,
+                        "C":1.72,
+                        "N":1.95,
+                        "O":2.25,
+                        "F":2.55}
 
         self.STO3G = []
 
         for a in atoms:
             for o in a.orbitals:
                 if o == "1s":
-                    a1 = 0.109810 * self.zeta1[a.name]**2
+                    a1 = 0.109818 * self.zeta1[a.name]**2
                     a2 = 0.405771 * self.zeta1[a.name]**2
                     a3 = 2.22766 * self.zeta1[a.name]**2
                     d1 = 0.444635
@@ -59,7 +78,7 @@ class STO3G():
                     a3 = 0.994203 * self.zeta2[a.name]**2
                     d1 = 0.391957
                     d2 = 0.607684
-                    d3 = 0.155916
+                    d3 = 0.1559163
 
                     self.STO3G.append({  "AOn":a.name,
                                     "AOt":o,
