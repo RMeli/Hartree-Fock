@@ -1,14 +1,14 @@
-from matrices import *
+from matrices2 import *
 
 import numpy.linalg as la
 
-def SCF_RHF_step(basis,N,R,Z,H,X,P_old,ee,verbose=False):
+def RHF_step(basis,molecule,N,H,X,P_old,ee,verbose=False):
 
     if verbose:
         print("\nDensity matrix P:")
         print(P_old)
 
-    G = G_ee(basis,N,R,Z,P_old,ee)
+    G = G_ee(basis,molecule,P_old,ee)
 
     if verbose:
         print("\nG matrix:")
@@ -28,6 +28,11 @@ def SCF_RHF_step(basis,N,R,Z,H,X,P_old,ee,verbose=False):
 
     e, Cx = la.eigh(Fx)
 
+    # Sort eigenvalues from smallest to highest (needed to compute P correctly)
+    idx = e.argsort()
+    e = e[idx]
+    Cx = Cx[:,idx]
+
     if verbose:
         print("\nCoefficients in orthogonal orbital basis:")
         print(Cx)
@@ -46,7 +51,7 @@ def SCF_RHF_step(basis,N,R,Z,H,X,P_old,ee,verbose=False):
 
     Pnew = P_density(C,N)
 
-    return Pnew, F, H
+    return Pnew, F, e
 
 def delta_P(P_old,P_new):
     delta = 0
@@ -59,23 +64,34 @@ def delta_P(P_old,P_new):
 
     return (delta / 4.)**(0.5)
 
-def energy_el(P,F,H,N):
+def energy_el(P,F,H):
+
+    # Size of the basis set
+    K = P.shape[0]
+
     E = 0
 
-    for i in range(N):
-        for j in range(N):
+    for i in range(K):
+        for j in range(K):
             E += 0.5 * P[i,j] * (H[i,j] + F[i,j])
 
     return E
 
-def energy_n(Z,R):
+def energy_n(molecule):
+
     en = 0
 
-    for i in range(len(R)):
-        for j in range(i+1,len(R)):
-            en += Z[i] * Z[j] / abs(R[i] - R[j])
+    for i in range(len(molecule)):
+        for j in range(i+1,len(molecule)):
+            atomi = molecule[i]
+            atomj = molecule[j]
+
+            Ri = np.asarray(atomi.R)
+            Rj = np.asarray(atomj.R)
+
+            en += atomi.Z * atomj.Z / la.norm(Ri - Rj)
 
     return en
 
-def energy_tot(P,F,H,N,Z,R):
-    return energy_el(P,F,H,N) + energy_n(Z,R)
+def energy_tot(P,F,H,molecule):
+    return energy_el(P,F,H) + energy_n(molecule)

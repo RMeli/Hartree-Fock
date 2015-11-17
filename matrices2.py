@@ -1,6 +1,8 @@
 from basis2 import *
 from integrals2 import *
 
+import numpy.linalg as la
+
 def S_overlap(basis):
     """
     Compute overlap matrix S.
@@ -152,7 +154,7 @@ def G_ee(basis,molecule,P,ee):
     """
 
     # Size of the basis set
-    K = basis.k
+    K = basis.K
 
     G = np.zeros((K,K))
 
