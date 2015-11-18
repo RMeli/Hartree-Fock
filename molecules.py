@@ -1,3 +1,15 @@
+from basis import *
+
+import numpy as np
+
+# H2
+H2 = [Atom("H",(0,0,0),1,["1s"]),Atom("H",(0,0,1.4),1,["1s"])]
+sto3g_H2 = STO3G(H2)
+
+# HeH+
+HeH = [Atom("He",(0,0,1.4632),2,["1s"]),Atom("H",(0,0,0),1,["1s"])]
+sto3g_HeH = STO3G(HeH)
+
 # He
 He = [Atom("He",(0,0,0),2,["1s"])]
 sto3g_He = STO3G(He)
@@ -19,14 +31,6 @@ sto3g_HF = STO3G(HF)
 # B
 O = [Atom("O",(0,0,0),8,["1s","2s","2p"])]
 sto3g_O = STO3G(O)
-
-# H2
-H2 = [Atom("H",(0,0,0),1,["1s"]),Atom("H",(0,0,1.4),1,["1s"])]
-sto3g_H2 = STO3G(H2)
-
-# HeH+
-HeH = [Atom("He",(0,0,1.4632),2,["1s"]),Atom("H",(0,0,0),1,["1s"])]
-sto3g_HeH = STO3G(HeH)
 
 # H2O
 H2O = [ Atom("H",(1.809*np.sin(104.52/2),0,0),1,["1s"]),

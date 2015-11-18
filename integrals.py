@@ -3,7 +3,7 @@ import scipy.misc as misc
 import scipy.special as spec
 import scipy.integrate as quad
 
-from basis2 import *
+from basis import *
 
 def gaussian_product(aa,bb,Ra,Rb):
 
@@ -121,8 +121,8 @@ def f(j,l,m,a,b):
 
     for k in range(max(0,j-m),min(j,l)+1):
         tmp = 1
-        tmp *= misc.comb(l,k,exact=True)
-        tmp *= misc.comb(m,j-k,exact=True)
+        tmp *= spec.binom(l,k)
+        tmp *= spec.binom(m,j-k)
         tmp *= a**(l-k)
         tmp *= b**(m+k-j)
 
@@ -208,8 +208,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
         t *= f(l,l1,l2,a,b)
         t *= misc.factorial(l,exact=True)
         t *= g**(r-l)
-        t /= misc.factorial(r,exact=True)
-        t /= misc.factorial(l-2*r,exact=True)
+        t /= misc.factorial(r,exact=True) * misc.factorial(l-2*r,exact=True)
 
         return t
 
@@ -221,8 +220,12 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
         b *= (-1)**i * (2*delta)**(2*(r+rr))
         b *= misc.factorial(l + ll - 2*r - 2*rr,exact=True)
         b *= delta**i * (Rp-Rq)**(l+ll-2*(r+rr+i))
-        b /= (4*delta)**(l+ll) * misc.factorial(i,exact=True)
-        b /= misc.factorial(l+ll-2*(r+rr+i),exact=True)
+
+        tmp = 1
+        tmp *= (4*delta)**(l+ll) * misc.factorial(i,exact=True)
+        tmp *= misc.factorial(l+ll-2*(r+rr+i),exact=True)
+
+        b /= tmp
 
         return b
 
@@ -247,7 +250,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
                                                             for tt in range(0,int(nn/2)+1):
                                                                 Bz = B(n,nn,t,tt,k,az,bz,Ra[2],Rb[2],Rp[2],g1,cz,dz,Rc[2],Rd[2],Rq[2],g2)
 
-                                                                nu = l + ll + m + mm + n + nn - 2 * (r+rr+s+ss+t+tt) - (i + j + k)
+                                                                nu = l+ll+m+mm+n+nn-2*(r+rr+s+ss+t+tt) - (i + j + k)
 
                                                                 ff = F(nu,np.dot(Rp-Rq,Rp-Rq)/(4*delta))
 

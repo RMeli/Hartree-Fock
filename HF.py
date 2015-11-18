@@ -8,23 +8,25 @@ from molecules import *
 import numpy as np
 import numpy.linalg as la
 
+###########################
+###########################
+###########################
 
-# Molecule
-mol = H2O
+mol = H2O # Molecule
+bs = sto3g_H2O # Basis set
+N = 10 # Number of electrons
 
-# Basis set
-bs = sto3g_H2O
+verbose = False
 
-# Number of electrons
-N = 10
+###########################
+###########################
+###########################
 
 # Basis set size
 K = bs.K
 
 print("Computing overlap matrix S...")
 S = S_overlap(bs)
-
-print(S)
 
 print("Computing orthogonalization matrix X...")
 X = X_transform(S)
@@ -35,7 +37,7 @@ Hc = H_core(bs,mol)
 print("Computing two-electron integrals...")
 ee = EE_list(bs)
 
-print_EE_list(ee)
+#print_EE_list(ee)
 
 Pnew = np.zeros((K,K))
 P = np.zeros((K,K))
@@ -53,7 +55,7 @@ while not converged and iter <= maxiter:
     print("\n\n\n#####\nSCF cycle " + str(iter) + ":")
     print("#####")
 
-    Pnew, F, E = RHF_step(bs,mol,N,Hc,X,P,ee,True)
+    Pnew, F, E = RHF_step(bs,mol,N,Hc,X,P,ee,verbose)
 
     print("\nTotal energy:", energy_tot(P,F,Hc,mol),"\n")
     print("   Orbital energies:")
