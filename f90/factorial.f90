@@ -44,7 +44,7 @@ MODULE FACT
             INTEGER :: fact2
 
             IF (n == -1) THEN
-                fact2 = -1
+                fact2 = 1
             ELSE IF (MOD(n,2) == 0) THEN ! EVEN NUMBER
                 fact2 = 1
 
