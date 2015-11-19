@@ -7,6 +7,9 @@ MODULE GAUSSIAN
 
     CONTAINS
 
+        ! ------------------------
+        ! Compute Gaussian product
+        ! ------------------------
         SUBROUTINE gaussian_product(aa,bb,Ra,Rb,pp,Rp,cp)
             IMPLICIT NONE
 
@@ -40,8 +43,9 @@ MODULE GAUSSIAN
 
 
 
-
-
+        ! --------------------------------------------------------------------
+        ! Norm of Cartesian Gaussian integrals with arbitrary angular momentum
+        ! --------------------------------------------------------------------
         FUNCTION norm(ax,ay,az,aa) result(N)
             IMPLICIT NONE
 

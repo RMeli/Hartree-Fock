@@ -301,7 +301,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
                                                                 nu = l+ll+m+mm+n+nn-2*(r+rr+s+ss+t+tt) - (i + j + k)
 
-                                                                ff = F(nu,np.dot(Rp-Rq,Rp-Rq)/(4*delta))
+                                                                ff = F(nu,np.dot(Rp-Rq,Rp-Rq)*g1*g2/(g1+g2))
 
                                                                 G += Bx * By * Bz * ff
 

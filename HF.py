@@ -48,7 +48,7 @@ print("   ##################")
 print("\n\n\nStarting SCF cycle")
 print("   ##################")
 
-maxiter = 50
+maxiter = 100
 
 iter = 1
 while not converged and iter <= maxiter:
@@ -61,7 +61,7 @@ while not converged and iter <= maxiter:
     print("   Orbital energies:")
     print("   ", np.diag(E))
 
-    if delta_P(P,Pnew) < 1e-12:
+    if delta_P(P,Pnew) < 1e-15:
         converged = True
 
         print("\n\n\nTOTAL ENERGY:", energy_tot(P,F,Hc,mol))
