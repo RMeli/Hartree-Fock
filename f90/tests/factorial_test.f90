@@ -18,4 +18,7 @@ PROGRAM test
         WRITE(*,*) i, "! =", factorial2(i)
     END DO
 
+    DO i = 0,N
+        WRITE(*,*) "binom(10,", i, ") =", binom(10,i)
+    END DO
 END PROGRAM test
