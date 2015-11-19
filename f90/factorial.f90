@@ -61,4 +61,22 @@ MODULE FACT
 
         END FUNCTION factorial2
 
+
+
+        ! --------------------
+        ! BINOMIAL COEFFICIENT
+        ! --------------------
+        FUNCTION binom(n,k)
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: n, k
+
+            ! OUTPUT
+            INTEGER :: binom
+
+            binom = factorial(n) / (factorial(k) * factorial(n-k))
+
+        END FUNCTION binom
+
 END MODULE FACT
