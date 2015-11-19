@@ -114,7 +114,10 @@ def f(j,l,m,a,b):
     Expansion coefficient.
 
     Source:
-
+        Handbook of Computational Chemistry
+        David Cook
+        Oxford University Press
+        1998
     """
 
     f = 0
@@ -141,6 +144,27 @@ def F(nu,x):
 
 
 def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
+    """
+    Compute nuclear-electron interaction integrals.
+
+
+    AX,AY,AZ: Angular momentum components for the first Gaussian.
+    BX,BY,BZ: Angular momentum components for the second Gaussian.
+    AA: Exponential coefficient for the first Gaussian.
+    BB: Exponential coefficient for the second Gaussian.
+    RA: Center of the first Gaussian.
+    RB: Center of the second Gaussian.
+    RN: Nuclear coordinates.
+    ZN: Nuclear charge.
+
+    Source:
+
+        Handbook of Computational Chemistry
+        David Cook
+        Oxford University Press
+        1998
+    """
+
     Vn = 0
 
     g = aa + bb
@@ -192,6 +216,31 @@ def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
 
 
 def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
+    """
+    Compute electron-electron interaction integrals.
+
+
+    AX,AY,AZ: Angular momentum components for the first Gaussian.
+    BX,BY,BZ: Angular momentum components for the second Gaussian.
+    CX,CY,CZ: Angular momentum components for the third Gaussian.
+    DX,DY,DZ: Angular momentum components for the fourth Gaussian.
+    AA: Exponential coefficient for the first Gaussian.
+    BB: Exponential coefficient for the second Gaussian.
+    CC: Exponential coefficient for the third Gaussian.
+    DD: Exponential coefficient for the fourth Gaussian.
+    RA: Center of the first Gaussian.
+    RB: Center of the second Gaussian.
+    RC: Center of the third Gaussian.
+    RD: Center of the fourth Gaussian.
+
+    Source:
+
+        Handbook of Computational Chemistry
+        David Cook
+        Oxford University Press
+        1998
+    """
+
 
     G = 0
 
