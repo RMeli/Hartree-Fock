@@ -56,8 +56,8 @@ MODULE GAUSSIAN
             ! OUTPUT
             REAL*8 :: N ! Normalization factor
 
-            N = (2 * aa / PI)**(3.0D0 / 4.0D0) * (4.0D0 * aa)**((ax + ay + ax) / 2.0D0)
-            N = N / SQRT(REAL(factorial2(2 * ax - 1) * factorial2(2 * ay - 1) * factorial2(2 * ax - 1)))
+            N = (2 * aa / PI)**(3.0D0 / 4.0D0) * (4.0D0 * aa)**((ax + ay + az) / 2.0D0)
+            N = N / SQRT(REAL(factorial2(2 * ax - 1) * factorial2(2 * ay - 1) * factorial2(2 * az - 1)))
 
         END FUNCTION norm
 
