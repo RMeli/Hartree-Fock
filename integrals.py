@@ -91,10 +91,16 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
         kc += 4 * aa * bb * Sxyz(ac+1,bc+1,aa,bb,Ra,Rb,Rc)
         kc *= 0.5
 
+        print(kc)
+
         Kc = 1
         Kc *= c * (np.pi / (aa+bb))**(3./2.) * kc
         Kc *= Sxyz(a1,b1,aa,bb,Ra1,Rb1,R1)
         Kc *= Sxyz(a2,b2,aa,bb,Ra2,Rb2,R2)
+
+        print(Sxyz(a1,b1,aa,bb,Ra1,Rb1,R1))
+        print(Sxyz(a2,b2,aa,bb,Ra2,Rb2,R2))
+        print(Kc)
 
         return Kc
 
@@ -264,7 +270,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     def B(l,ll,r,rr,i,l1,l2,Ra,Rb,Rp,g1,l3,l4,Rc,Rd,Rq,g2):
         b = 1
-        b *= (-1)**ll * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
+        b *= (-1)**(ll) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
         b *= theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2)
         b *= (-1)**i * (2*delta)**(2*(r+rr))
         b *= misc.factorial(l + ll - 2*r - 2*rr,exact=True)

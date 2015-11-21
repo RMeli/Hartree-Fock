@@ -12,9 +12,9 @@ import numpy.linalg as la
 ###########################
 ###########################
 
-mol = H2O # Molecule
-bs = sto3g_H2O # Basis set
-N = 10 # Number of electrons
+mol = H2 # Molecule
+bs = sto3g_H2 # Basis set
+N = 2 # Number of electrons
 
 verbose = False
 
@@ -61,7 +61,7 @@ while not converged and iter <= maxiter:
     print("   Orbital energies:")
     print("   ", np.diag(E))
 
-    if delta_P(P,Pnew) < 1e-15:
+    if delta_P(P,Pnew) < 1e-12:
         converged = True
 
         print("\n\n\nTOTAL ENERGY:", energy_tot(P,F,Hc,mol))
