@@ -91,16 +91,10 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
         kc += 4 * aa * bb * Sxyz(ac+1,bc+1,aa,bb,Ra,Rb,Rc)
         kc *= 0.5
 
-        print(kc)
-
         Kc = 1
         Kc *= c * (np.pi / (aa+bb))**(3./2.) * kc
         Kc *= Sxyz(a1,b1,aa,bb,Ra1,Rb1,R1)
         Kc *= Sxyz(a2,b2,aa,bb,Ra2,Rb2,R2)
-
-        print(Sxyz(a1,b1,aa,bb,Ra1,Rb1,R1))
-        print(Sxyz(a2,b2,aa,bb,Ra2,Rb2,R2))
-        print(Kc)
 
         return Kc
 
@@ -145,7 +139,33 @@ def F(nu,x):
         return t**(2*nu) * np.exp(-x*t**2)
 
     F = quad.quad(f,0,1,epsabs=1e-12,epsrel=1e-12,limit=500)[0]
+    """
 
+    tol = 1e-15
+
+    if nu < 10:
+        resid = 1
+
+        ex = np.exp(-x) * 0.5
+
+        s = spec.gamma(nu + 0.5) / spec.gamma(nu + 1.5)
+
+        b = ex * s
+
+        i = 1
+        while resid > tol:
+            s += spec.gamma(nu + 0.5) * x**i / spec.gamma(nu + i + 1.5)
+
+            bnew = ex * s
+
+            resid = abs(b - bnew)
+
+            b = bnew
+
+            i += 1
+
+        F = b
+        """
     return F
 
 
