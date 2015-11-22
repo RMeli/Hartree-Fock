@@ -122,6 +122,8 @@ def H_core(basis,molecule):
     for atom in molecule:
         Vn += V_nuclear(basis,atom)
 
+    print(Vn)
+
     return T + Vn
 
 def P_density(C,N):
