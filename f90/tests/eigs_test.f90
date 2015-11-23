@@ -2,15 +2,14 @@ PROGRAM eigs_test
 
     USE UTILS, only: eigs, print_real_matrix
 
-    INTEGER, PARAMETER :: d = 3
+    INTEGER, PARAMETER :: d = 2
 
     REAL*8, dimension(d,d) :: A
     REAL*8, dimension(d,d) :: V
     REAL*8, dimension(d) :: l
 
-    A(1,:) = (/3.0D0, 2.0D0, 1.5D0/)
-    A(2,:) = (/2.0D0, -6.0D0, 3.0D0/)
-    A(3,:) = (/1.5D0, 5.0D0, 5.0D0/)
+    A(1,:) = (/-1.53866, -0.515838/)
+    A(2,:) = (/-0.515838, -2.43973/)
 
     CALL EIGS(d,A,V,l)
 
