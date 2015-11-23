@@ -52,4 +52,39 @@ MODULE UTILS
 
     END SUBROUTINE print_ee_list
 
+    ! ------------------------
+    ! SOLVE EIGENVALUE PROBLEM
+    ! ------------------------
+    SUBROUTINE EIGS(d,M,V,lambda)
+
+        IMPLICIT NONE
+
+        ! INPUT
+        INTEGER, intent(in) :: d                        ! Dimension of M (d x d)
+        REAL*8, dimension(d,d),intent(in) :: M          ! Matrix M
+
+        ! INTERMEDIATE VARIABLES
+        INTEGER, PARAMETER :: LWMAX = 10000             ! Maximal workspace size
+        INTEGER :: LWORK = -1                           ! Query optimal workspace size
+        INTEGER :: INFO                                 ! Information flag for DSYEV
+        REAL*8, dimension(LWMAX) :: WORK
+
+        ! OUTPUT
+        REAL*8, dimension(d,d), intent(inout) :: V      ! Eigenvectors
+        REAL*8, dimension(d), intent(out) :: lambda     ! Eigenvalues
+
+        V = M
+
+        CALL  DSYEV('V','U', d, V, d, lambda, WORK, LWORK, INFO )       ! Query optimal workspace size
+        LWORK = WORK(1)                                                 ! Workspace size
+
+        CALL  DSYEV('V','U', d, V, d, lambda, WORK, LWORK, INFO )       ! Solve the eigenvalue problem
+
+        IF (INFO .NE. 0) THEN
+            WRITE(*,*) "ERROR: IMPOSSIBLE TO SOLVE THE EIGENVALUE PROBLEM!"
+        END IF
+
+    END SUBROUTINE EIGS
+
+
 END MODULE UTILS
