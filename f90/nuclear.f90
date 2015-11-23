@@ -259,15 +259,15 @@ MODULE NUCLEAR
 
             ! INTERMEDIATE VARIABLES
             REAL*8 :: eps
-            REAL*8 :: g                                     ! Gaussian produc exponential coefficient
-            REAL*8, dimension(3) :: Rp                      ! Gaussian produc center
-            REAL*8 :: cp                                    ! Gaussian product multiplicative constant
-            INTEGER :: l, r, i, m, s, j, n, t, k            ! Loop indices
-            REAL*8 :: AAx, AAy, AAz                            ! Temporary calls to FUNCTION A
-            INTEGER :: nu                                   ! Boys function index
+            REAL*8 :: g                             ! Gaussian produc exponential coefficient
+            REAL*8, dimension(3) :: Rp              ! Gaussian produc center
+            REAL*8 :: cp                            ! Gaussian product multiplicative constant
+            INTEGER :: l, r, i, m, s, j, n, t, k    ! Loop indices
+            REAL*8 :: AAx, AAy, AAz                 ! Temporary calls to FUNCTION A
+            INTEGER :: nu                           ! Boys function index
 
             ! OUTPUT
-            REAL*8 :: Vn                                    ! Nuclear matrix element
+            REAL*8 :: Vn ! Nuclear matrix element
 
 
             CALL gaussian_product(aa,bb,Ra,Rb,g,Rp,cp)
@@ -328,8 +328,8 @@ MODULE NUCLEAR
             INTEGER, intent(in) :: Kf                       ! Number of basis functions
             REAL*8, dimension(Kf,3), intent(in) :: basis_R  ! Basis set niclear positions
             INTEGER, dimension(Kf,3), intent(in) :: basis_L ! Basis set angular momenta
-            REAL*8, dimension(Kf,3), intent(in) :: basis_D  ! Basis set contraction coefficients
-            REAL*8, dimension(Kf,3), intent(in) :: basis_A  ! Basis set exponential contraction coefficients
+            REAL*8, dimension(Kf,c), intent(in) :: basis_D  ! Basis set contraction coefficients
+            REAL*8, dimension(Kf,c), intent(in) :: basis_A  ! Basis set exponential contraction coefficients
             REAL*8, dimension(3), intent(in) :: Rn          ! Nuclear position
             INTEGER, intent(in) :: Zn                       ! Nuclear charge (> 0)
 
