@@ -91,7 +91,7 @@ MODULE NUCLEAR
             ! OUTPUT
             REAL :: res
 
-            res = tt**(2*nunu) * EXP(-xx*tt**2)
+            res = tt**(2*nunu) * DEXP(-xx*tt**2)
 
         END FUNCTION INT
 

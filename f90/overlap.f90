@@ -3,6 +3,7 @@ MODULE OVERLAP
     USE CONSTANTS
     USE FACT
     USE GAUSSIAN
+    USE UTILS
 
     CONTAINS
 
@@ -140,5 +141,39 @@ MODULE OVERLAP
             END DO ! i
 
         END SUBROUTINE S_overlap
+
+
+        SUBROUTINE X_transform(Kf,SS,X)
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: Kf                       ! Basis set size
+            REAl*8, dimension(Kf,Kf), intent(in) :: SS      ! Overlap matrix S
+
+            ! INTERMEDIATE VARIABLES
+            REAL*8, dimension(Kf) :: sss                    ! Temporal storage of eigenvalues
+            REAL*8, dimension(Kf,Kf) :: S_sqrt              ! Inverse square root of S
+            REAL*8, dimension(Kf,Kf) :: U                   ! Temporal storage of eigenvectors
+            INTEGER :: i
+
+            ! OUTPUT
+            REAL*8, dimension(Kf,Kf), intent(out) :: X      ! Basi set orthogonalization matrix
+
+            CALL EIGS(Kf,SS,U,sss)
+
+            S_sqrt(:,:) = 0.0D0 ! Initialize U
+
+            ! Store square of eigenvectors as a diagonal matrix in U
+            DO i = 0, Kf
+                S_sqrt(i,i) = (sss(i))**(-0.5D0)
+            END DO
+
+            X = MATMUL(U,S_sqrt)
+
+        END SUBROUTINE
+
+
+
 
 END MODULE OVERLAP
