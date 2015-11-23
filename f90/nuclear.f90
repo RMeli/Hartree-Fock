@@ -79,6 +79,9 @@ MODULE NUCLEAR
         END FUNCTION boys0
 
         FUNCTION INT(tt) result(res)
+            ! -----------------------
+            ! Boys function integrand
+            ! -----------------------
 
             IMPLICIT NONE
 
@@ -235,9 +238,9 @@ MODULE NUCLEAR
 
 
         FUNCTION nuclear_coeff(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn) result(Vn)
-            ! -------------------------------------
-            ! Compute
-            ! -------------------------------------
+            ! -------------------------------------------------------------------------
+            ! Compute electon-nucleus integral between two Cartesian Gaussian functions
+            ! -------------------------------------------------------------------------
             !
             ! Source:
             !   Handbook of Computational Chemistry
@@ -245,7 +248,7 @@ MODULE NUCLEAR
             !   Oxford University Press
             !   1998
             !
-            !--------------------------------------
+            !--------------------------------------------------------------------------
 
             ! INPUT
             INTEGER, intent(in) :: ax, ay, az, bx, by, bz   ! Angular momentum coefficients
