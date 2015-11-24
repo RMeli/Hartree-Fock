@@ -64,8 +64,8 @@ MODULE UTILS
         REAL*8, dimension(d,d),intent(in) :: M          ! Matrix M
 
         ! INTERMEDIATE VARIABLES
-        INTEGER, PARAMETER :: LWMAX = 1000             ! Maximal workspace size
-        INTEGER :: LWORK                           ! Query optimal workspace size ()
+        INTEGER, PARAMETER :: LWMAX = 10000             ! Maximal workspace size
+        INTEGER :: LWORK                                ! Query optimal workspace size ()
         INTEGER :: INFO                                 ! Information flag for DSYEV
         REAL*8, dimension(LWMAX) :: WORK
 
