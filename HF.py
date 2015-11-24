@@ -16,7 +16,7 @@ mol = HeH # Molecule
 bs = sto3g_HeH # Basis set
 N = 2 # Number of electrons
 
-maxiter = 2
+maxiter = 100
 
 verbose = True
 

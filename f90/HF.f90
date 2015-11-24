@@ -48,7 +48,7 @@ PROGRAM HF
     REAL*8, dimension(K) :: E           ! Orbital energies
 
     LOGICAL :: converged = .FALSE.  ! Convergence parameter
-    INTEGER, PARAMETER :: maxiter = 2 !
+    INTEGER, PARAMETER :: maxiter = 100 !
     INTEGER :: step = 0     ! SCF steps counter
 
 
@@ -108,6 +108,8 @@ PROGRAM HF
         IF ( delta_P(K,Pold,Pnew) < 1.0e-12) THEN
             converged = .TRUE.
 
+            WRITE(*,*)
+            WRITE(*,*) "SCF cycle converged!"
             WRITE(*,*)
             WRITE(*,*)
             WRITE(*,*)
