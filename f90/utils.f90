@@ -64,19 +64,21 @@ MODULE UTILS
         REAL*8, dimension(d,d),intent(in) :: M          ! Matrix M
 
         ! INTERMEDIATE VARIABLES
-        INTEGER, PARAMETER :: LWMAX = 10000             ! Maximal workspace size
-        INTEGER :: LWORK = -1                           ! Query optimal workspace size
+        INTEGER, PARAMETER :: LWMAX = 1000             ! Maximal workspace size
+        INTEGER :: LWORK                           ! Query optimal workspace size ()
         INTEGER :: INFO                                 ! Information flag for DSYEV
         REAL*8, dimension(LWMAX) :: WORK
 
         ! OUTPUT
-        REAL*8, dimension(d,d), intent(inout) :: V      ! Eigenvectors
+        REAL*8, dimension(d,d), intent(out) :: V        ! Eigenvectors
         REAL*8, dimension(d), intent(out) :: lambda     ! Eigenvalues
 
         V = M
 
+        LWORK = -1
         CALL  DSYEV('V','U', d, V, d, lambda, WORK, LWORK, INFO )       ! Query optimal workspace size
-        LWORK = WORK(1)                                                 ! Workspace size
+        LWORK = MIN(LWMAX, INT(WORK(1))) * 2 * d                        ! Optimal workspace size
+                                                                        ! See (http://www.netlib.org/lapack/lug/node120.html)
 
         CALL  DSYEV('V','U', d, V, d, lambda, WORK, LWORK, INFO )       ! Solve the eigenvalue problem
 
