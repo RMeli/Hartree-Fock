@@ -12,11 +12,13 @@ import numpy.linalg as la
 ###########################
 ###########################
 
-mol = H2O # Molecule
-bs = sto3g_H2O # Basis set
-N = 10 # Number of electrons
+mol = HeH # Molecule
+bs = sto3g_HeH # Basis set
+N = 2 # Number of electrons
 
-verbose = False
+maxiter = 2
+
+verbose = True
 
 ###########################
 ###########################
@@ -37,7 +39,7 @@ Hc = H_core(bs,mol)
 print("Computing two-electron integrals...")
 ee = EE_list(bs)
 
-#print_EE_list(ee)
+print_EE_list(ee)
 
 Pnew = np.zeros((K,K))
 P = np.zeros((K,K))
@@ -47,8 +49,6 @@ converged = False
 print("   ##################")
 print("\n\n\nStarting SCF cycle")
 print("   ##################")
-
-maxiter = 100
 
 iter = 1
 while not converged and iter <= maxiter:
