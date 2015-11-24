@@ -78,7 +78,7 @@ MODULE NUCLEAR
 
         END FUNCTION boys0
 
-        FUNCTION INT(tt) result(res)
+        FUNCTION INTEGRAND(tt) result(res)
             ! -----------------------
             ! Boys function integrand
             ! -----------------------
@@ -93,7 +93,7 @@ MODULE NUCLEAR
 
             res = tt**(2*nunu) * DEXP(-xx*tt**2)
 
-        END FUNCTION INT
+        END FUNCTION INTEGRAND
 
         ! -------------
         ! BOYS FUNCTION
@@ -142,7 +142,7 @@ MODULE NUCLEAR
             xx = x      ! Set global MODULE variable to input variable (side effect: change in INT)
 
             ! TODO DOUBLE precision routine
-            CALL qags(INT,0.0,1.0,1.0E-5,1.0E-5, result, abserr, neval, ier) ! Call QUADPACK routine
+            CALL qags(INTEGRAND,0.0,1.0,1.0E-5,1.0E-5, result, abserr, neval, ier) ! Call QUADPACK routine
 
             IF (ier .NE. 0) THEN
                 WRITE(*,*) ier
