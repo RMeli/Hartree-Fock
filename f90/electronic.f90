@@ -164,6 +164,10 @@ MODULE ELECTRONIC
 
         END FUNCTION electronic_coeff
 
+
+        ! ---------------------------------------
+        ! GENERATE LIST OF TWO-ELECTRON INTEGRALS
+        ! ---------------------------------------
         SUBROUTINE ee_list(Kf,basis_D,basis_A,basis_L,basis_R,ee)
 
             IMPLICIT NONE
@@ -236,5 +240,49 @@ MODULE ELECTRONIC
             END DO ! i
 
         END SUBROUTINE ee_list
+
+
+        ! ----------------------------------
+        ! ELECTRON-ELECTRON REPULSION MATRIX
+        ! ----------------------------------
+        SUBROUTINE G_ee(Kf,ee,P,G)
+            ! -----------------------------------------------------------------------
+            ! Compute the electron-electron repulsion matrix using the density matrix
+            ! -----------------------------------------------------------------------
+            !
+            ! Source:
+            !   Szabo and Ostlund
+            !   Modern Quantum Chemistry
+            !   Doever
+            !   1989
+            !
+            ! ------------------------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: Kf                           ! Number of basis functions
+            REAL*8, dimension(Kf,Kf,Kf,Kf), intent(in) :: ee    ! Electron-electron list
+            REAL*8, dimension(Kf,Kf) :: P                       ! Density matrix
+
+            ! INTERMEDIATE VARIABLES
+            INTEGER :: i, j, k, l
+
+            ! OUTPUT
+            REAL*8, dimension(Kf,Kf), intent(out) :: G          ! Electron-electron repulsion matrix
+
+            G(:,:) = 0.0D0
+
+            DO i = 1, Kf
+                DO j = 1, Kf
+                    DO k = 1, Kf
+                        DO l = 1, Kf
+                            G(i,j) = G(i,j) + P(k,l) * (ee(i,j,k,l) - 0.5D0 * ee(i,l,k,j))
+                        END DO ! l
+                    END DO ! k
+                END DO ! j
+            END DO ! i
+
+        END SUBROUTINE G_ee
 
 END MODULE ELECTRONIC
