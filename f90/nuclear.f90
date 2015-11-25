@@ -6,8 +6,8 @@ MODULE NUCLEAR
 
     IMPLICIT NONE
 
-    REAL*8 :: xx
-    INTEGER :: nunu
+    !REAL*8 :: xx
+    !INTEGER :: nunu
 
     CONTAINS
         FUNCTION f(j,l,m,a,b)
@@ -78,27 +78,112 @@ MODULE NUCLEAR
 
         END FUNCTION boys0
 
-        FUNCTION INTEGRAND(tt) result(res)
+        !FUNCTION INTEGRAND(tt) result(res)
             ! -----------------------
             ! Boys function integrand
             ! -----------------------
 
-            IMPLICIT NONE
+        !    IMPLICIT NONE
 
             ! INPUT
-            REAL, intent(in) :: tt
+        !    REAL, intent(in) :: tt
 
             ! OUTPUT
-            REAL :: res
+        !    REAL :: res
 
-            res = tt**(2*nunu) * DEXP(-xx*tt**2)
+        !    res = tt**(2*nunu) * DEXP(-xx*tt**2)
 
-        END FUNCTION INTEGRAND
+        !END FUNCTION INTEGRAND
 
         ! -------------
         ! BOYS FUNCTION
         ! -------------
         FUNCTION boys(nu,x)
+            ! ------------------------------------------------------------------------
+            ! Compute boys function (different strategies for different x)
+            ! ------------------------------------------------------------------------
+            !
+            ! Source:
+            !   On the evaluation of Boys functions using downward  recursion relation
+            !   B. A. Mamedov
+            !   Journal of Mathematical Chemistry
+            !   2004
+            !
+            ! ------------------------------------------------------------------------
+
+            IMPLICIT NONE
+
+            REAL*8, EXTERNAL :: gamain
+
+            ! INPUT
+            INTEGER, intent(in) :: nu   ! Boys' index
+            REAL*8, intent(in) :: x
+
+            ! INTERMEDIATE VARIABLES
+            !REAL*8 :: prod
+            !REAL*8 :: sum
+            !REAL*8 :: sumold
+            INTEGER :: idx
+
+            ! OUTPUT
+            REAL*8 :: boys
+
+            boys = 0.0D0
+
+            IF (x .LE. 1e-8) THEN   ! First order Taylor expansion of the integrand
+
+                boys = 1.0D0 / (2.0D0 * nu + 1) - x / (2.0D0 * nu + 3)
+
+            ELSE
+            !ELSE IF ((x .GT. 1.0D-8) .AND. (x .LT. 35.0D0)) THEN
+                !prod = (2.0D0*nu + 1.0D0)
+                !sum = 1.0D0 / prod
+                !sumold = 0.0D0
+
+                !idx = 1
+                !DO WHILE ((sum-sumold) .GT. 1e-9)
+                !    sumold = sum
+
+                !    prod = prod * (2 * nu + 2 * idx + 1)
+
+                !    sum = sum + (2.0D0 * x)**idx / prod
+
+                !    idx = idx + 1
+                !END DO
+
+                !boys = sum * DEXP(-x)
+
+                !!!
+                boys = 0.0D0
+                idx = 0
+
+                boys = gamain(x, nu +0.5D0, idx)
+
+                boys = boys * GAMMA(nu + 0.5D0)
+
+                boys = 0.5D0 * boys / (x**(nu+0.5D0))
+
+
+            !ELSE IF ((x .GE. 35.0D0) .AND. (x .LT. 60.0D0)) THEN
+            !    prod = 0.5D0 * DSQRT(PI)  / DSQRT(x)
+
+            !    DO idx = 1, nu - 1
+            !        prod = (idx + 0.5) * prod / x
+            !    END DO
+
+            !    boys = prod
+
+            !ELSE IF (x .GE. 60.0D0) THEN
+            !    boys = 0.5D0 * DSQRT(PI / x) * factorial2(2*nu - 1) / (2*x)**nu
+            END IF
+
+        END FUNCTION boys
+
+
+        ! -------------
+        ! BOYS FUNCTION
+        ! -------------
+        !FUNCTION boys2(nu,x)
             ! -------------------------------------------------------------------------
             ! Boys function
             ! -------------------------------------------------------------------------
@@ -118,39 +203,39 @@ MODULE NUCLEAR
             !
             ! -------------------------------------------------------------------------
 
-            IMPLICIT NONE
+        !    IMPLICIT NONE
 
             ! INPUT
-            INTEGER, intent(in) :: nu
-            REAL*8, intent(in) :: x
+        !    INTEGER, intent(in) :: nu
+        !    REAL*8, intent(in) :: x
 
             ! INTERMEDIATE VARIABLES
             !INTEGER :: i
             !REAL*8 :: exp, fact
             !REAL*8 :: b, bnew, sum,  resid
-            REAL :: result, abserr
-            INTEGER :: neval, ier
+        !    REAL :: result, abserr
+        !    INTEGER :: neval, ier
 
             ! PARAMETERS
             !INTEGER, PARAMETER :: trans = 10        ! Transition between small X and large X
             !REAL*8, PARAMETER :: tol = 1.0D-12      ! Boys series convergence
 
             ! OUTPUT
-            REAL*8 :: boys
+        !    REAL*8 :: boys2
 
-            nunu = nu   ! Set global MODULE variable to input variable (side effect: change in INT)
-            xx = x      ! Set global MODULE variable to input variable (side effect: change in INT)
+        !    nunu = nu   ! Set global MODULE variable to input variable (side effect: change in INT)
+        !    xx = x      ! Set global MODULE variable to input variable (side effect: change in INT)
 
             ! TODO DOUBLE precision routine
-            CALL qags(INTEGRAND,0.0,1.0,1.0E-5,1.0E-5, result, abserr, neval, ier) ! Call QUADPACK routine
+        !    CALL qags(INTEGRAND,0.0,1.0,1.0E-5,1.0E-5, result, abserr, neval, ier) ! Call QUADPACK routine
 
-            IF (ier .NE. 0) THEN
-                WRITE(*,*) ier
-            END IF
+        !    IF (ier .NE. 0) THEN
+        !        WRITE(*,*) ier
+        !    END IF
 
-            boys = result
+        !    boys2 = result
 
-            !boys = 0.0D0
+        !    !boys = 0.0D0
 
             !IF (nu == 0) THEN
             !    boys = boys0(x) ! Call Boys function from Szabo and Ostlund
@@ -203,7 +288,7 @@ MODULE NUCLEAR
 
             !END IF
 
-        END FUNCTION boys
+        !END FUNCTION boys2
 
         FUNCTION A(l,r,i,l1,l2,Ra,Rb,Rc,Rp,eps)
             ! -------------------------------------
@@ -269,7 +354,6 @@ MODULE NUCLEAR
             ! OUTPUT
             REAL*8 :: Vn ! Nuclear matrix element
 
-
             CALL gaussian_product(aa,bb,Ra,Rb,g,Rp,cp)
 
             eps = 1.0D0 / (4.0D0 * g)
@@ -310,9 +394,9 @@ MODULE NUCLEAR
         END FUNCTION nuclear_coeff
 
 
-        ! -------------
+        ! --------------------------------
         ! NUCLEUS-ELECRON POTENTIAL MATRIX
-        ! -------------
+        ! --------------------------------
         SUBROUTINE V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,Vn,Rn,Zn)
             ! ------------------------------------------
             ! Compute nucleus-electrona potential matrix
