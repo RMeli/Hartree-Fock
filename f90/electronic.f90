@@ -104,12 +104,12 @@ MODULE ELECTRONIC
             ! OUTPUT
             REAL*8 :: G ! Electron-electron repulsion coefficient
 
-            delta = 1.0D0 / (4.0D0 * g1) + 1.0D0 / (4.0D0 * g2)
-
             G = 0.0D0
 
             CALL gaussian_product(aa,bb,Ra,Rb,g1,Rp,c1) ! Gaussian product of left gaussians
             CALL gaussian_product(cc,dd,Rc,Rd,g2,Rq,c2) ! Gaussian product of right gaussians
+
+            delta = 1.0D0 / (4.0D0 * g1) + 1.0D0 / (4.0D0 * g2)
 
             DO l = 0, ax + bx
                 DO r = 0, FLOOR(l / 2.0)
