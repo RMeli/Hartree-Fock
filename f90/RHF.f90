@@ -1,8 +1,12 @@
 MODULE RHF
 
-    USE UTILS, only: EIGS, print_real_matrix
-    USE DENSITY, only: P_density
-    USE ELECTRONIC, only: G_ee
+    USE UTILS, only: EIGS, print_real_matrix, print_ee_list
+    USE DENSITY, only: P_density, delta_P
+    USE ELECTRONIC, only: G_ee, EE_list
+    USE ENERGY, only: E_tot
+    USE CONSTANTS
+    USE OVERLAP, only: S_overlap, X_transform
+    USE CORE, only: H_core
 
     IMPLICIT NONE
 
@@ -97,6 +101,121 @@ MODULE RHF
             CALL P_density(Kf,Ne,C,Pnew) ! Compute new density
 
         END SUBROUTINE RHF_step
+
+
+        ! ---------
+        ! SCF Cycle
+        ! ---------
+        SUBROUTINE SCF(Kf,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
+            ! --------------------------------
+            ! Compute total energy (SCF cycle)
+            ! --------------------------------
+
+            ! INPUT
+            INTEGER, intent(in) :: Kf                                   ! Basis set size
+            INTEGER, intent(in) :: Ne                                   ! Number of electrons
+            INTEGER, intent(in) :: Nn                                   ! Number of nuclei
+            INTEGER, dimension(Kf,3), intent(in) :: basis_L              ! Angular momenta of basis set Gaussians
+            REAL*8, dimension(Kf,3), intent(in) :: basis_R               ! Centers of basis set Gaussians
+            REAL*8, dimension(Kf,c), intent(in) :: basis_D, basis_A      ! Basis set coefficients
+            REAL*8, dimension(Nn,3), intent(in) :: Rn                   ! Nuclear positions
+            INTEGER, dimension(Nn), intent(in) :: Zn                    ! Nuclear charges
+            LOGICAL, intent(in) :: verbose                              ! Verbose flag
+
+            ! OUTPUT
+            REAL*8,intent(out) :: final_E                                              ! Converged total energy
+
+            ! --------
+            ! MATRICES
+            ! --------
+
+            REAL*8, dimension(Kf,Kf) :: S     ! Overlap matrix
+            REAL*8, dimension(Kf,Kf) :: X     ! Transformation matrix
+
+            REAL*8, dimension(Kf,Kf) :: Hc    ! Core Hamiltonian
+
+            REAL*8, dimension(Kf,Kf) :: Pold  ! Old density matrix
+            REAL*8, dimension(Kf,Kf) :: Pnew  ! New density matrix
+
+            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee ! List of electron-electron integrals
+
+            REAL*8, dimension(Kf,Kf) :: F     ! Fock matrix
+            REAL*8, dimension(Kf) :: E           ! Orbital energies
+
+            ! --------------
+            ! SCF PARAMETERS
+            ! --------------
+
+            LOGICAL :: converged = .FALSE.          ! Convergence parameter
+            INTEGER, PARAMETER :: maxiter = 100     ! Maximal number of iterations
+            INTEGER :: step = 0                 !    SCF steps counter
+
+            ! -----------------
+            ! HF INITIALIZATION
+            ! -----------------
+
+            CALL S_overlap(Kf,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
+
+            IF (verbose) THEN
+                WRITE(*,*) "Overlap matrix S:"
+                CALL print_real_matrix(Kf,Kf,S)
+            END IF
+
+            CALL X_transform(Kf,S,X) ! Compute transformation matrix
+
+            IF (verbose) THEN
+                WRITE(*,*) "Transformation matrix X:"
+                CALL print_real_matrix(Kf,Kf,X)
+            END IF
+
+            CALL H_core(Kf,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
+            CALL EE_list(Kf,basis_D,basis_A,basis_L,basis_R,ee)
+
+            IF (verbose) THEN
+                CALL print_ee_list(Kf,ee)
+            END IF
+
+            Pold(:,:) = 0.0D0
+            Pnew(:,:) = 0.0D0
+
+            ! ----------
+            ! SCF CYCLES
+            ! ----------
+
+            IF (verbose) THEN
+                WRITE(*,*) "SCF step #", step
+            END IF
+
+            DO WHILE ((converged .EQV. .FALSE.) .AND. step .LT. maxiter)
+                step = step + 1
+
+                CALL RHF_step(Kf,Ne,Hc,X,ee,Pold,Pnew,F,E,verbose)
+
+                IF (verbose) THEN
+                    WRITE(*,*   )
+                    WRITE(*,*) "Total energy:", E_tot(Kf,Nn,Rn,Zn,Pold,F,Hc)
+                END IF
+
+                IF ( delta_P(Kf,Pold,Pnew) < 1.0e-12) THEN
+                    converged = .TRUE.
+
+                    final_E = E_tot(Kf,Nn,Rn,Zn,Pold,F,Hc)
+
+                    IF (verbose) THEN
+                        WRITE(*,*)
+                        WRITE(*,*) "SCF cycle converged!"
+                        WRITE(*,*)
+                        WRITE(*,*)
+                        WRITE(*,*)
+                        WRITE(*,*) "TOTAL ENERGY:", final_E
+                    END IF
+                END IF
+
+                Pold = Pnew
+
+            END DO ! SCF
+
+        END SUBROUTINE SCF
 
 
 END MODULE RHF
