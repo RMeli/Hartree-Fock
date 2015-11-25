@@ -1,16 +1,10 @@
 PROGRAM HF
 
     USE RHF
-    USE OVERLAP, only: S_overlap, X_transform
-    USE CORE, only: H_core
-    USE ELECTRONIC, only: EE_list
-    USE DENSITY, only: delta_P
-    USE ENERGY, only: E_tot
     USE UTILS
+    USE CONSTANTS
 
     IMPLICIT NONE
-
-    INTEGER, PARAMETER :: c = 3 ! Number of contractions (STO-3G)
 
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
     REAL*8, PARAMETER :: zeta_He = 2.0925D0 ! STO coefficient correction for He
@@ -27,36 +21,16 @@ PROGRAM HF
     REAL*8, dimension(K,3) :: basis_R               ! Centers of basis set Gaussians
     REAL*8, dimension(K,c) :: basis_D, basis_A  ! Basis set coefficients
 
-    REAL*8, dimension(Nn,3) :: Rn   ! Nuclear positions
-    INTEGER, dimension(Nn) :: Zn    ! Nuclear charges
-
-    ! -----------------
-    ! HF DECLARATION
-    ! -----------------
-
-    REAL*8, dimension(K,K) :: S     ! Overlap matrix
-    REAL*8, dimension(K,K) :: X     ! Transformation matrix
-
-    REAL*8, dimension(K,K) :: Hc    ! Core Hamiltonian
-
-    REAL*8, dimension(K,K) :: Pold  ! Old density matrix
-    REAL*8, dimension(K,K) :: Pnew  ! New density matrix
-
-    REAl*8, dimension(K,K,K,K) :: ee ! List of electron-electron integrals
-
-    REAL*8, dimension(K,K) :: F     ! Fock matrix
-    REAL*8, dimension(K) :: E           ! Orbital energies
-
-    LOGICAL :: converged = .FALSE.  ! Convergence parameter
-    INTEGER, PARAMETER :: maxiter = 100 !
-    INTEGER :: step = 0     ! SCF steps counter
-
-
     ! -------------
     ! MOLECULE HeH+
     ! -------------
 
+    REAL*8, dimension(Nn,3) :: Rn   ! Nuclear positions
+    INTEGER, dimension(Nn) :: Zn    ! Nuclear charges
+
     INTEGER, PARAMETER :: Ne = 2    ! Total number of electrons
+
+    REAL*8 :: final_E               ! Total converged energy
 
     Rn(1,1:3) = (/0.0D0, 0.0D0, 0.0D0/)       ! Position of first H atom
     Rn(2,1:3) = (/1.4632D0, 0.0D0, 0.0D0/)    ! Position of the second H atom
@@ -75,49 +49,10 @@ PROGRAM HF
     basis_A(1,1:c) = (/0.109818D0 * zeta_H**2, 0.405771 * zeta_H**2, 2.22766 * zeta_H**2/)
     basis_A(2,1:c) = (/0.109818D0 * zeta_He**2, 0.405771 * zeta_He**2, 2.22766 * zeta_He**2/)
 
-    ! -----------------
-    ! HF INITIALIZATION
-    ! -----------------
+    ! ------------------------
+    ! TOTAL ENERGY CALCULATION
+    ! ------------------------
 
-    CALL S_overlap(K,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
-    CALL X_transform(K,S,X) ! Compute transformation matrix
-    CALL H_core(K,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
-    CALL EE_list(K,basis_D,basis_A,basis_L,basis_R,ee)
-
-    CALL print_ee_list(K,ee)
-
-    Pold(:,:) = 0.0D0
-    Pnew(:,:) = 0.0D0
-
-    ! ----------
-    ! SCF CYCLES
-    ! ----------
-
-    CALL print_real_matrix(K,K,X)
-
-    WRITE(*,*) "SCF step #", step
-
-    DO WHILE ((converged .EQV. .FALSE.) .AND. step .LT. maxiter)
-        step = step + 1
-
-        CALL RHF_step(K,Ne,Hc,X,ee,Pold,Pnew,F,E,.TRUE.)
-
-        WRITE(*,*   )
-        WRITE(*,*) "Total energy:", E_tot(K,Nn,Rn,Zn,Pold,F,Hc)
-
-        IF ( delta_P(K,Pold,Pnew) < 1.0e-12) THEN
-            converged = .TRUE.
-
-            WRITE(*,*)
-            WRITE(*,*) "SCF cycle converged!"
-            WRITE(*,*)
-            WRITE(*,*)
-            WRITE(*,*)
-            WRITE(*,*) "TOTAL ENERGY:", E_tot(K,Nn,Rn,Zn,Pold,F,Hc)
-        END IF
-
-        Pold = Pnew
-
-    END DO
+    CALL SCF(K,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
 
 END PROGRAM HF
