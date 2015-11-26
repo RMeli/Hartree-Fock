@@ -2,10 +2,9 @@ PROGRAM kinetic_test
 
     USE KINETIC
     USE UTILS, only: print_real_matrix
+    USE CONSTANTS
 
     IMPLICIT NONE
-
-    INTEGER, PARAMETER :: c = 3 ! Number of contractions (STO-3G)
 
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
     REAL*8, PARAMETER :: zeta_He = 2.0925D0 ! STO coefficient correction for He
