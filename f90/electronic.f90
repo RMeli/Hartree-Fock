@@ -33,7 +33,7 @@ MODULE ELECTRONIC
 
             t = 1.0D0
             t = t * f(l,l1,l2,a,b) * factorial(l) * g**(r-l)
-            t = t / (factorial(r) * factorial(l - 2*r))
+            t = t / ( factorial(r) * factorial(l - 2*r) )
 
         END FUNCTION theta
 
@@ -63,9 +63,9 @@ MODULE ELECTRONIC
             B = 1.0D0
             B = B * (-1)**(ll) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
             B = B * theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2) * (-1)**i
-            B = B * (2*delta)**(2*(r+rr)) * factorial(l + ll - 2 * r - 2 * rr)
+            B = B * (2.0D0*delta)**(2*(r+rr)) * factorial(l + ll - 2 * r - 2 * rr)
             B = B * delta**i * (Rp-Rq)**(l+ll - 2*(r+rr+i))
-            B = B / ( (4*delta)**(l+ll) * factorial(i) * factorial(l+ll - 2*(r+rr+i)) )
+            B = B / ( (4.0D0*delta)**(l+ll) * factorial(i) * factorial(l+ll - 2*(r+rr+i)) )
 
         END FUNCTION B
 
@@ -113,25 +113,26 @@ MODULE ELECTRONIC
 
             DO l = 0, ax + bx
                 DO r = 0, FLOOR(l / 2.0)
-                    DO i = 0, FLOOR((l-2*r) / 2.0)
-                        DO ll = 0, cx + dx
-                            DO rr = 0, FLOOR(ll / 2.0)
+                    DO ll = 0, cx + dx
+                        DO rr = 0, FLOOR(ll / 2.0)
+                            DO i = 0, FLOOR((l+ll-2*r-2*rr) / 2.0)
+
                                  BBx = B(l,ll,r,rr,i,ax,bx,Ra(1),Rb(1),Rp(1),g1,&
                                          cx,dx,Rc(1),Rd(1),Rq(1),g2,delta)
 
-                                 DO m = 0, az + by
+                                 DO m = 0, ay + by
                                      DO s = 0, FLOOR(m / 2.0)
-                                         DO j = 0, FLOOR((m-2*s) / 2.0)
-                                             DO mm = 0, cy + dy
-                                                 DO ss = 0, FLOOR(mm / 2.0)
+                                         DO mm = 0, cy + dy
+                                             DO ss = 0, FLOOR(mm / 2.0)
+                                                 DO j = 0, FLOOR((m+mm-2*s-2*ss) / 2.0)
                                                     BBy = B(m,mm,s,ss,j,ay,by,Ra(2),Rb(2),Rp(2),&
                                                             g1,cy,dy,Rc(2),Rd(2),Rq(2),g2,delta)
 
                                                     DO n = 0, az + bz
                                                         DO t = 0, FLOOR(n / 2.0)
-                                                            DO k = 0, FLOOR((n-2*t) / 2.0)
-                                                                DO nn = 0, cz + dz
-                                                                    DO tt = 0, FLOOR(nn / 2.0)
+                                                            DO nn = 0, cz + dz
+                                                                DO tt = 0, FLOOR(nn / 2.0)
+                                                                    DO k = 0, FLOOR((n+nn-2*t-2*tt) / 2.0)
 
                                                                         BBz = B(n,nn,t,tt,k,az,bz,Ra(3),Rb(3),Rp(3),g1,&
                                                                                 cz,dz,Rc(3),Rd(3),Rq(3),g2,delta)
@@ -159,8 +160,8 @@ MODULE ELECTRONIC
                 END DO ! r
             END DO ! k
 
-        G = G * norm(ax,ay,az,aa) * norm(bx,by,bz,bb) * norm(cx,cy,cz,cc) * norm(dx,dy,dz,dd)
-        G = G * c1 * c2 * 2.0D0 * PI**2 / (g1 * g2) * SQRT(PI / (g1 + g2))
+            G = G * norm(ax,ay,az,aa) * norm(bx,by,bz,bb) * norm(cx,cy,cz,cc) * norm(dx,dy,dz,dd)
+            G = G * c1 * c2 * 2.0D0 * PI**2 / (g1 * g2) * SQRT(PI / (g1 + g2))
 
         END FUNCTION electronic_coeff
 
@@ -190,6 +191,7 @@ MODULE ELECTRONIC
 
             ! OUTPUT
             REAL*8, dimension(Kf,Kf,Kf,Kf), intent(out) :: ee   ! List of electron-electron integrals
+
             ee(:,:,:,:) = 0.0D0
 
             DO i = 1,Kf
