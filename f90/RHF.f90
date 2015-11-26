@@ -169,6 +169,12 @@ MODULE RHF
             END IF
 
             CALL H_core(Kf,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
+
+            IF (verbose) THEN
+                WRITE(*,*) "Core Hamiltonian Hc:"
+                CALL print_real_matrix(Kf,Kf,Hc)
+            END IF
+
             CALL EE_list(Kf,basis_D,basis_A,basis_L,basis_R,ee)
 
             IF (verbose) THEN

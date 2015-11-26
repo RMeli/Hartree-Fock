@@ -2,6 +2,7 @@ MODULE CORE
 
     USE KINETIC, only: T_kinetic
     USE NUCLEAR, only: V_nuclear
+    USE UTILS, only: print_real_matrix
 
     IMPLICIT NONE
 
@@ -12,6 +13,7 @@ MODULE CORE
             ! TODO Allow flexibility for basis sets other than STO-3G
             ! HARD CODED
             INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
+            LOGICAL, PARAMETER :: verbose = .TRUE.
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions
@@ -34,8 +36,20 @@ MODULE CORE
 
             CALL T_kinetic(Kf,basis_D,basis_A,basis_L,basis_R,H)
 
+            IF (verbose) THEN
+                WRITE(*,*) "Kinetic energy matrix T:"
+                CALL print_real_matrix(Kf,Kf,H)
+            END IF
+
             DO i = 1, Nn
+                M(:,:) = 0.0D0
+
                 CALL V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,M,Rn(i,1:3),Zn(i))
+
+                IF (verbose) THEN
+                    WRITE(*,*) "Nuclear attraction matrix V:", i
+                    CALL print_real_matrix(Kf,Kf,M)
+                END IF
 
                 H = H + M
             END DO
