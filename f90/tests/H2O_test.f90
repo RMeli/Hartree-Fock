@@ -12,9 +12,8 @@ PROGRAM HF_H2
     IMPLICIT NONE
 
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
-    REAL*8, PARAMETER :: zeta_He = 2.0925D0 ! STO coefficient correction for He
-    REAL*8, PARAMETER :: zeta_O_1 = 7.66D0 ! STO coefficient correction for He
-    REAL*8, PARAMETER :: zeta_O_2 = 2.25D0 ! STO coefficient correction for He
+    REAL*8, PARAMETER :: zeta_O_1 = 7.66D0 ! STO coefficient correction for O
+    REAL*8, PARAMETER :: zeta_O_2 = 2.25D0 ! STO coefficient correction for O
 
     ! -----------------
     ! BASIS SET FOR H2O
@@ -37,9 +36,9 @@ PROGRAM HF_H2
 
     REAL*8 :: final_E               ! Total converged energy
 
-    Rn(1,1:3) = (/0.0D0, 1.43233673D0, -0.96104039D0/)       ! Position of first H atom
-    Rn(2,1:3) = (/0.0D0, -1.43233673D0, -0.96104039D0/)    ! Position of the second H atom
-    Rn(3,1:3) = (/0.0D0, 0.0D0, 0.24026010D0/)
+    Rn(1,1:3) = (/1.809*SIN(104.52/180*PI/2.0D0), 0.0D0, 0.0D0/)        ! Position of first H atom
+    Rn(2,1:3) = (/-1.809*SIN(104.52/180*PI/2.0D0), 0.0D0, 0.0D0/)       ! Position of the second H atom
+    Rn(3,1:3) = (/0.0D0, 1.809*COS(104.52/180*PI/2.0D0), 0.0D0/)        ! Position of the O atom
 
     Zn = (/1, 1, 8/)
 
