@@ -114,6 +114,9 @@ def V_nuclear(basis,atom):
 def H_core(basis,molecule):
     T = T_kinetic(basis)
 
+    print("Kinetic energy")
+    print(T)
+
     # Size of the basis set
     K = basis.K
 
@@ -122,7 +125,10 @@ def H_core(basis,molecule):
     for atom in molecule:
         Vn += V_nuclear(basis,atom)
 
-    print(Vn)
+        print("Nucelar attraction")
+        print(Vn)
+
+
 
     return T + Vn
 

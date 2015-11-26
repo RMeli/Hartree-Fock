@@ -135,38 +135,42 @@ def f(j,l,m,a,b):
 
 def F(nu,x):
 
+    if x < 1e-8:
+        return 1 / (2 * nu + 1) - x / (2 * nu + 3)
+    else:
+        return 0.5 / x**(nu+0.5) * spec.gamma(nu+0.5)*spec.gammainc(nu+0.5,x)
+
+
+    """
     def f(t):
         return t**(2*nu) * np.exp(-x*t**2)
 
     F = quad.quad(f,0,1,epsabs=1e-12,epsrel=1e-12,limit=500)[0]
+    return F
+    """
+    """
+    if x < 1e-8:
+        return 1 / (2 * nu + 1) - x / (2 * nu + 3)
+    else x >= 1e-8 and x < 35:
+        prod = (2*nu+1)
+        ss = 1 / prod
+        ssold = 0
+
+        idx = 1
+        while abs(ss-ssold) > 1e-12:
+            ssold = ss
+
+            prod *= 2*nu + 2 * idx + 1
+
+            ss += (2*x)**idx / prod
+
+            idx += 1
+
+        return ss * np.exp(-x)
     """
 
-    tol = 1e-15
 
-    if nu < 10:
-        resid = 1
 
-        ex = np.exp(-x) * 0.5
-
-        s = spec.gamma(nu + 0.5) / spec.gamma(nu + 1.5)
-
-        b = ex * s
-
-        i = 1
-        while resid > tol:
-            s += spec.gamma(nu + 0.5) * x**i / spec.gamma(nu + i + 1.5)
-
-            bnew = ex * s
-
-            resid = abs(b - bnew)
-
-            b = bnew
-
-            i += 1
-
-        F = b
-        """
-    return F
 
 
 def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
@@ -290,7 +294,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     def B(l,ll,r,rr,i,l1,l2,Ra,Rb,Rp,g1,l3,l4,Rc,Rd,Rq,g2):
         b = 1
-        b *= (-1)**(ll) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
+        b *= (-1)**(l) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
         b *= theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2)
         b *= (-1)**i * (2*delta)**(2*(r+rr))
         b *= misc.factorial(l + ll - 2*r - 2*rr,exact=True)
@@ -306,28 +310,28 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     for l in range(0,ax+bx+1):
         for r in range(0,int(l/2)+1):
-            for i in range(0,int((l-2*r)/2)+1):
-                for ll in range(0,cx+dx+1):
-                    for rr in range(0,int(ll/2)+1):
+            for ll in range(0,cx+dx+1):
+                for rr in range(0,int(ll/2)+1):
+                    for i in range(0,int((l+ll-2*r-2*rr)/2)+1):
                         Bx = B(l,ll,r,rr,i,ax,bx,Ra[0],Rb[0],Rp[0],g1,cx,dx,Rc[0],Rd[0],Rq[0],g2)
 
                         for m in range(0,ay+by+1):
                             for s in range(0,int(m/2)+1):
-                                for j in range(0,int((m-2*s)/2)+1):
-                                    for mm in range(0,cy+dy+1):
-                                        for ss in range(0,int(mm/2)+1):
+                                for mm in range(0,cy+dy+1):
+                                    for ss in range(0,int(mm/2)+1):
+                                        for j in range(0,int((m+mm-2*s-2*ss)/2)+1):
                                             By = B(m,mm,s,ss,j,ay,by,Ra[1],Rb[1],Rp[1],g1,cy,dy,Rc[1],Rd[1],Rq[1],g2)
 
                                             for n in range(0,az+bz+1):
                                                 for t in range(0,int(n/2)+1):
-                                                    for k in range(0,int((n-2*t)/2)+1):
-                                                        for nn in range(0,cz+dz+1):
-                                                            for tt in range(0,int(nn/2)+1):
+                                                    for nn in range(0,cz+dz+1):
+                                                        for tt in range(0,int(nn/2)+1):
+                                                            for k in range(0,int((n+nn-2*t-2*tt)/2)+1):
                                                                 Bz = B(n,nn,t,tt,k,az,bz,Ra[2],Rb[2],Rp[2],g1,cz,dz,Rc[2],Rd[2],Rq[2],g2)
 
                                                                 nu = l+ll+m+mm+n+nn-2*(r+rr+s+ss+t+tt) - (i + j + k)
 
-                                                                ff = F(nu,np.dot(Rp-Rq,Rp-Rq)*g1*g2/(g1+g2))
+                                                                ff = F(nu,np.dot(Rp-Rq,Rp-Rq)/(4.*delta))
 
                                                                 G += Bx * By * Bz * ff
 

@@ -12,9 +12,9 @@ import numpy.linalg as la
 ###########################
 ###########################
 
-mol = HeH # Molecule
-bs = sto3g_HeH # Basis set
-N = 2 # Number of electrons
+mol = N2 # Molecule
+bs = sto3g_N2 # Basis set
+N = 14 # Number of electrons
 
 maxiter = 100
 
@@ -29,12 +29,15 @@ K = bs.K
 
 print("Computing overlap matrix S...")
 S = S_overlap(bs)
+print(S)
 
 print("Computing orthogonalization matrix X...")
 X = X_transform(S)
+print(X)
 
 print("Computing core Hamiltonian...")
 Hc = H_core(bs,mol)
+print(Hc)
 
 print("Computing two-electron integrals...")
 ee = EE_list(bs)
