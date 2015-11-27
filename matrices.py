@@ -122,13 +122,18 @@ def H_core(basis,molecule):
 
     Vn = np.zeros((K,K))
 
+    Vnn  = np.zeros((K,K))
+
     for atom in molecule:
-        Vn += V_nuclear(basis,atom)
+        Vnn = V_nuclear(basis,atom)
 
-        print("Nucelar attraction")
-        print(Vn)
+        print("Nuclear attraction Vn")
+        print(Vnn)
 
+        Vn += Vnn
 
+    print("Total nuclear attraction matrix")
+    print(Vn)
 
     return T + Vn
 

@@ -12,9 +12,9 @@ import numpy.linalg as la
 ###########################
 ###########################
 
-mol = N2 # Molecule
-bs = sto3g_N2 # Basis set
-N = 14 # Number of electrons
+mol = H2O # Molecule
+bs = sto3g_H2O # Basis set
+N = 10 # Number of electrons
 
 maxiter = 100
 
