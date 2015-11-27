@@ -136,10 +136,13 @@ def f(j,l,m,a,b):
 def F(nu,x):
 
     if x < 1e-8:
-        return 1 / (2 * nu + 1) - x / (2 * nu + 3)
+        ff =  1 / (2 * nu + 1) - x / (2 * nu + 3)
     else:
-        return 0.5 / x**(nu+0.5) * spec.gamma(nu+0.5)*spec.gammainc(nu+0.5,x)
+        ff = 0.5 / x**(nu+0.5) * spec.gamma(nu+0.5)*spec.gammainc(nu+0.5,x)
 
+    #print(ff)
+
+    return ff
 
     """
     def f(t):
