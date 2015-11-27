@@ -26,13 +26,16 @@ MODULE CORE
             INTEGER, dimension(Nn), intent(in) :: Zn        ! Nuclear charges (> 0)
 
             ! INTERMEDIATE VARIABLE
-            REAL*8, dimension(Kf,Kf) :: M   ! Matrix storing Hamiltonian components
+            REAL*8, dimension(Kf,Kf) :: V   ! Matrix storing total potential components
+            REAL*8, dimension(Kf,Kf) :: M   ! Matrix storing one-atom potential conponents
             INTEGER :: i                    ! Loop index
 
             ! OUTPUT
             REAL*8, dimension(Kf,Kf), intent(out) :: H ! Core Hamiltonian
 
             H(:,:) = 0.0D0
+
+            V(:,:) = 0.0D0
 
             CALL T_kinetic(Kf,basis_D,basis_A,basis_L,basis_R,H)
 
@@ -51,8 +54,15 @@ MODULE CORE
                     CALL print_real_matrix(Kf,Kf,M)
                 END IF
 
-                H = H + M
+                V = V + M
             END DO
+
+            IF (verbose) THEN
+                WRITE(*,*) "Total nuclear attraction matrix V:", i
+                CALL print_real_matrix(Kf,Kf,V)
+            END IF
+
+            H = H + V
 
         END SUBROUTINE H_core
 
