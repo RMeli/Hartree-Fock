@@ -5,8 +5,6 @@ PROGRAM nuclear_test
 
     IMPLICIT NONE
 
-    INTEGER, PARAMETER :: c = 3 ! Number of contractions (STO-3G)
-
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
     REAL*8, PARAMETER :: zeta_He = 2.0925D0 ! STO coefficient correction for He
     REAL*8, PARAMETER :: zeta_O_1 = 7.66D0 ! STO coefficient correction for He
@@ -126,10 +124,10 @@ PROGRAM nuclear_test
     WRITE(*,*) "Nuclear matrix V1:"
     CALL print_real_matrix(K_HeH,K_HeH,Vn1_HeH)
 
-    CALL V_nuclear(K_HeH,basis_D_HeH,basis_A_HeH,basis_L_HeH,basis_R_HeH,Vn1_HeH,R_HeH(2,1:3),Zn_HeH(2))
+    CALL V_nuclear(K_HeH,basis_D_HeH,basis_A_HeH,basis_L_HeH,basis_R_HeH,Vn2_HeH,R_HeH(2,1:3),Zn_HeH(2))
 
     WRITE(*,*) "Nuclear matrix V2:"
-    CALL print_real_matrix(K_HeH,K_HeH,Vn1_HeH)
+    CALL print_real_matrix(K_HeH,K_HeH,Vn2_HeH)
 
     ! ------------
     ! MOLECULE H2O
@@ -173,6 +171,9 @@ PROGRAM nuclear_test
     basis_A_H2O(6,1:c) = (/0.0751386D0 * zeta_O_2**2, 0.231031 * zeta_O_2**2, 0.994203 * zeta_O_2**2/)
     basis_A_H2O(7,1:c) = (/0.0751386D0 * zeta_O_2**2, 0.231031 * zeta_O_2**2, 0.994203 * zeta_O_2**2/)
 
+    WRITE(*,*) "BASIS A H2O"
+    CALL print_real_matrix(K_H2O,c,basis_A_H2O)
+
     WRITE(*,*) "############"
     WRITE(*,*) "Molecule H2O"
     WRITE(*,*) "############"
@@ -181,7 +182,7 @@ PROGRAM nuclear_test
     CALL V_nuclear(K_H2O,basis_D_H2O,basis_A_H2O,basis_L_H2O,basis_R_H2O,Vn2_H2O,R_H2O(2,1:3),Zn_H2O(2))
     CALL V_nuclear(K_H2O,basis_D_H2O,basis_A_H2O,basis_L_H2O,basis_R_H2O,Vn3_H2O,R_H2O(3,1:3),Zn_H2O(3))
 
-    WRITE(*,*) "Total nuclear matrix T:"
+    WRITE(*,*) "Total nuclear matrix V:"
     CALL print_real_matrix(K_H2O,K_H2O,Vn1_H2O + Vn2_H2O + Vn3_H2O)
 
 END PROGRAM nuclear_test

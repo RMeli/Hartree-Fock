@@ -29,7 +29,7 @@ MODULE NUCLEAR
 
             ! INTERMEDIATE VARIABLES
             INTEGER :: k    ! Loop index
-            REAl*8 :: tmp
+            REAl*8 :: tmp   ! Temporary product
 
             ! OUTPUT
             REAL*8 :: f
@@ -45,55 +45,6 @@ MODULE NUCLEAR
             END DO
 
         END FUNCTION f
-
-
-        FUNCTION boys0(x)
-            ! ----------------------------
-            ! Boys function for s orbitals
-            ! ----------------------------
-            !
-            ! Source:
-            !   Szabo and Ostlund
-            !   Modern Quantum Chemistry
-            !   Doever
-            !   1989
-            !
-            ! ----------------------------
-
-            IMPLICIT NONE
-
-            !INPUT
-            REAL*8,intent(in) :: x
-
-            ! OUTPUT
-            REAL*8 :: boys0
-
-            boys0 = 0.0D0
-
-            IF (x .LT. 1.0D-12) THEN ! Asymptotic value
-                boys0 = 1.0D0 - x / 3.0D0
-            ELSE
-                boys0 = DSQRT(PI / x) * DERF(DSQRT(x)) / 2.0D0
-            END IF
-
-        END FUNCTION boys0
-
-        !FUNCTION INTEGRAND(tt) result(res)
-            ! -----------------------
-            ! Boys function integrand
-            ! -----------------------
-
-        !    IMPLICIT NONE
-
-            ! INPUT
-        !    REAL, intent(in) :: tt
-
-            ! OUTPUT
-        !    REAL :: res
-
-        !    res = tt**(2*nunu) * DEXP(-xx*tt**2)
-
-        !END FUNCTION INTEGRAND
 
         ! -------------
         ! BOYS FUNCTION
@@ -113,7 +64,7 @@ MODULE NUCLEAR
 
             IMPLICIT NONE
 
-            REAL*8, EXTERNAL :: gamain
+            REAL*8, EXTERNAL :: DGAMIT
 
             ! INPUT
             INTEGER, intent(in) :: nu   ! Boys' index
@@ -123,58 +74,26 @@ MODULE NUCLEAR
             !REAL*8 :: prod
             !REAL*8 :: sum
             !REAL*8 :: sumold
-            INTEGER :: idx
+            !INTEGER :: idx
 
             ! OUTPUT
             REAL*8 :: boys
 
             boys = 0.0D0
 
-            IF (x .LE. 1e-8) THEN   ! First order Taylor expansion of the integrand
+            IF (x .LE. 1e-6) THEN   ! First order Taylor expansion of the integrand
 
-                boys = 1.0D0 / (2.0D0 * nu + 1) - x / (2.0D0 * nu + 3)
+                boys = 1.0D0 / (2.0D0 * nu + 1.0D0) - x / (2.0D0 * nu + 3.0D0)
 
             ELSE
-            !ELSE IF ((x .GT. 1.0D-8) .AND. (x .LT. 35.0D0)) THEN
-                !prod = (2.0D0*nu + 1.0D0)
-                !sum = 1.0D0 / prod
-                !sumold = 0.0D0
-
-                !idx = 1
-                !DO WHILE ((sum-sumold) .GT. 1e-9)
-                !    sumold = sum
-
-                !    prod = prod * (2 * nu + 2 * idx + 1)
-
-                !    sum = sum + (2.0D0 * x)**idx / prod
-
-                !    idx = idx + 1
-                !END DO
-
-                !boys = sum * DEXP(-x)
-
-                !!!
                 boys = 0.0D0
-                idx = 0
+                !idx = 0
 
-                boys = gamain(x, nu +0.5D0, idx)
+                boys = 0.5D0 * DGAMIT(nu + 0.5D0, x) * GAMMA(nu + 0.5D0)
 
-                boys = boys * GAMMA(nu + 0.5D0)
+                !boys = boys * GAMMA(nu + 0.5D0)
 
-                boys = 0.5D0 * boys / (x**(nu+0.5D0))
-
-
-            !ELSE IF ((x .GE. 35.0D0) .AND. (x .LT. 60.0D0)) THEN
-            !    prod = 0.5D0 * DSQRT(PI)  / DSQRT(x)
-
-            !    DO idx = 1, nu - 1
-            !        prod = (idx + 0.5) * prod / x
-            !    END DO
-
-            !    boys = prod
-
-            !ELSE IF (x .GE. 60.0D0) THEN
-            !    boys = 0.5D0 * DSQRT(PI / x) * factorial2(2*nu - 1) / (2*x)**nu
+                !boys = 0.5D0 * boys / (x**(nu + 0.5D0))
             END IF
 
         END FUNCTION boys
@@ -317,12 +236,14 @@ MODULE NUCLEAR
             A = A * factorial(l)
             A = A * (Rp-Rc)**(l - 2*r - 2*i)
             A = A * eps**(r+i)
-            A = A / (factorial(r)*factorial(i)*factorial(l - 2*r - 2*i))
+            A = A / factorial(r)
+            A = A / factorial(i)
+            A = A / factorial(l - 2*r - 2*i)
 
         END FUNCTION A
 
 
-        FUNCTION nuclear_coeff(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn) result(Vn)
+        FUNCTION nuclear_coeff(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn) result(Vnn)
             ! -------------------------------------------------------------------------
             ! Compute electon-nucleus integral between two Cartesian Gaussian functions
             ! -------------------------------------------------------------------------
@@ -352,13 +273,13 @@ MODULE NUCLEAR
             INTEGER :: nu                           ! Boys function index
 
             ! OUTPUT
-            REAL*8 :: Vn ! Nuclear matrix element
+            REAL*8 :: Vnn ! Nuclear matrix element
 
             CALL gaussian_product(aa,bb,Ra,Rb,g,Rp,cp)
 
             eps = 1.0D0 / (4.0D0 * g)
 
-            Vn = 0.0D0
+            Vnn = 0.0D0
 
             DO l = 0, ax+bx
                 DO r = 0, FLOOR(l / 2.0)
@@ -367,7 +288,7 @@ MODULE NUCLEAR
 
                         DO m = 0, ay+by
                             DO s = 0, FLOOR(m / 2.0)
-                                DO j = 0, FLOOR((m - 2*s)/2.)
+                                DO j = 0, FLOOR((m - 2*s)/2.0)
                                     AAy = A(m,s,j,ay,by,Ra(2),Rb(2),Rn(2),Rp(2),eps)
 
                                     DO n = 0, az+bz
@@ -377,7 +298,7 @@ MODULE NUCLEAR
 
                                                 nu = l + m + n - 2 * (r + s + t) - (i + j + k)
 
-                                                Vn = Vn + AAx * AAy * AAz * boys(nu,g*DOT_PRODUCT(Rp-Rn,Rp-Rn))
+                                                Vnn = Vnn + AAx * AAy * AAz * boys(nu,g*DOT_PRODUCT(Rp-Rn,Rp-Rn))
 
                                             END DO ! k
                                         END DO ! t
@@ -389,7 +310,7 @@ MODULE NUCLEAR
                 END DO ! r
             END DO ! l
 
-            Vn = Vn * (-Zn) * norm(ax,ay,az,aa) * norm(bx,by,bz,bb) * cp * 2.0D0 * PI / g
+            Vnn = Vnn * (-Zn) * norm(ax,ay,az,aa) * norm(bx,by,bz,bb) * cp * 2.0D0 * PI / g
 
         END FUNCTION nuclear_coeff
 
@@ -397,16 +318,12 @@ MODULE NUCLEAR
         ! --------------------------------
         ! NUCLEUS-ELECRON POTENTIAL MATRIX
         ! --------------------------------
-        SUBROUTINE V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,Vn,Rn,Zn)
+        SUBROUTINE V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,Vn,Rnn,Znn)
             ! ------------------------------------------
             ! Compute nucleus-electrona potential matrix
             ! ------------------------------------------
 
             IMPLICIT NONE
-
-            ! TODO Allow flexibility for basis sets other than STO-3G
-            ! HARD CODED
-            INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions
@@ -414,8 +331,8 @@ MODULE NUCLEAR
             INTEGER, dimension(Kf,3), intent(in) :: basis_L ! Basis set angular momenta
             REAL*8, dimension(Kf,c), intent(in) :: basis_D  ! Basis set contraction coefficients
             REAL*8, dimension(Kf,c), intent(in) :: basis_A  ! Basis set exponential contraction coefficients
-            REAL*8, dimension(3), intent(in) :: Rn          ! Nuclear position
-            INTEGER, intent(in) :: Zn                       ! Nuclear charge (> 0)
+            REAL*8, dimension(3), intent(in) :: Rnn         ! Nuclear position
+            INTEGER, intent(in) :: Znn                      ! Nuclear charge (> 0)
 
             ! INTERMEDIATE VARIABLES
             INTEGER :: i,j,k,l
@@ -431,17 +348,17 @@ MODULE NUCLEAR
                     DO k = 1,c
                         DO l = 1,c
                             tmp = basis_D(i,k) * basis_D(j,l)
-                            tmp = tmp * nuclear_coeff(  basis_L(i,1),&  ! lx for basis function i
-                                                        basis_L(i,2),&  ! ly for basis function i
-                                                        basis_L(i,3),&  ! lz for basis function i
-                                                        basis_L(j,1),&  ! lx for basis function j
-                                                        basis_L(j,2),&  ! ly for basis function j
-                                                        basis_L(j,3),&  ! lz for basis function j
-                                                        basis_A(i,k),&  ! Exponential coefficient for basis function i, contraction k
-                                                        basis_A(j,l),&  ! Exponential coefficient for basis function j, contraction l
-                                                        basis_R(i,:),&  ! Center of basis function i
-                                                        basis_R(j,:),&  ! Center of basis function j
-                                                        Rn,Zn)          ! Nuclear position and nuclear charge
+                            tmp = tmp * nuclear_coeff(  basis_L(i,1),&      ! lx for basis function i
+                                                        basis_L(i,2),&      ! ly for basis function i
+                                                        basis_L(i,3),&      ! lz for basis function i
+                                                        basis_L(j,1),&      ! lx for basis function j
+                                                        basis_L(j,2),&      ! ly for basis function j
+                                                        basis_L(j,3),&      ! lz for basis function j
+                                                        basis_A(i,k),&      ! Exponential coefficient for basis function i, contraction k
+                                                        basis_A(j,l),&      ! Exponential coefficient for basis function j, contraction l
+                                                        basis_R(i,:),&      ! Center of basis function i
+                                                        basis_R(j,:),&      ! Center of basis function j
+                                                        Rnn,Znn)            ! Nuclear position and nuclear charge
 
                             Vn(i,j) = Vn(i,j) + tmp
                         END DO ! l
