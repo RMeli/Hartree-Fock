@@ -1,3 +1,20 @@
+"""
+    Copyright (C) 2015 Rocco Meli
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import numpy as np
 import scipy.misc as misc
 import scipy.special as spec
@@ -6,12 +23,33 @@ import scipy.integrate as quad
 from basis import *
 
 def gaussian_product(aa,bb,Ra,Rb):
+    """
+    Gaussian produc theorem.
 
+    INPUT:
+        AA: Exponential coefficient of Gaussian 1
+        BB: Exponential coefficient of Gaussian 2
+        RA: Center of Gaussian 1
+        RB: Center of Gaussian 2
+    OUTPUT:
+        R: Gaussian product center
+        C: Gaussian product coefficient
+
+    Source:
+        Modern Quantum Chemistry
+        Szabo and Ostlund
+        Dover
+        1989
+    """
+
+    # Transform centers in Numpy arrays
     Ra = np.asarray(Ra)
     Rb = np.asarray(Rb)
 
+    # Compute Gaussian product center
     R = (aa * Ra + bb * Rb) / (aa + bb)
 
+    # Compute Gaussian product coefficient
     c = np.dot(Ra-Rb,Ra-Rb)
     c *= - aa*bb / (aa + bb)
     c = np.exp(c)
@@ -19,6 +57,25 @@ def gaussian_product(aa,bb,Ra,Rb):
     return R,c
 
 def norm(ax,ay,az,aa):
+    """
+    General cartesian Gaussian normalization factor.
+
+    INPUT:
+        AX: Angular momentum lx
+        AY: Angular momentum ly
+        AZ: Angular momentum lz
+        AA: Gaussian exponential coefficient
+    OUTPUT:
+        N: Normalization coefficient (to be multiplied with the Gaussian)
+
+    Source:
+        Handbook of Computational Chemistry
+        David Cook
+        Oxford University Press
+        1998
+    """
+
+    # Compute normalization coefficient
     N = (2*aa/np.pi)**(3./4.)
     N *= (4*aa)**((ax+ay+az)/2)
     N /= np.sqrt( misc.factorial2(2*ax-1) * misc.factorial2(2*ay-1) * misc.factorial2(2*az-1) )
@@ -27,8 +84,26 @@ def norm(ax,ay,az,aa):
 
 def Sxyz(a,b,aa,bb,Ra,Rb,R):
     """
-    Compute overlap integral between two unnormalized Cartesian gaussian functions along one direction
+    Compute overlap integral between two unnormalized Cartesian gaussian functions along one direction.
+
+    INPUT:
+        A: Angular momentum along the chosen direction for Gaussian 1
+        B: Angular momentum along the chosen direction for Gaussian 2
+        AA: Exponential coefficient for Gaussian 1
+        BB: Exponential coefficient for Gaussian 2
+        RA: Coordinate (along chosen direction) of the center of Gaussian 1
+        RB: Coordinate (along chosen direction) of the center of Gaussian 2
+        R: Coordinate (along chosen direction) of the center of the product of the two gaussians
+    OUTPUT:
+        S: Overlap of the two gaussians along the chosen direction
+
+    Source:
+        The Mathematica Journal
+        Evaluation of Gaussian Molecular Integrals
+        I. Overlap Integrals
+        Minhhuy Hô and Julio Manuel Hernández-Pérez
     """
+
     S = 0
 
     for i in range(a+1):
@@ -47,7 +122,21 @@ def Sxyz(a,b,aa,bb,Ra,Rb,R):
 
 def overlap(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     """
-    Compute overlap integral between two Cartesian gaussian functions
+    Compute overlap integral between two Cartesian gaussian functions.
+
+    INPUT:
+        AX: Angular momentum lx for Gaussian 1
+        AY: Angular momentum ly for Gaussian 1
+        AZ: Angular momentum lz for Gaussian 1
+        AA: Exponential coefficient for Gaussian 1
+        BX: Angular momentum lx for Gaussian 2
+        BY: Angular momentum ly for Gaussian 2
+        BZ: Angular momentum lz for Gaussian 2
+        BB: Exponential coefficient for Gaussian 2
+        RA: Center of Gaussian 1
+        RB: Center of Gaussian 2
+    OUTPUT:
+        S: Overlap of the two gaussians
 
     Source:
         The Mathematica Journal
@@ -56,23 +145,39 @@ def overlap(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
         Minhhuy Hô and Julio Manuel Hernández-Pérez
     """
 
+    # Compute gaussian product center and coefficient
     R,c = gaussian_product(aa,bb,Ra,Rb)
 
+    # Compute normalization factors for the two gaussians
     Na = norm(ax,ay,az,aa)
     Nb = norm(bx,by,bz,bb)
 
     S = 1
-    S *= Sxyz(ax,bx,aa,bb,Ra[0],Rb[0],R[0]) # Sx
-    S *= Sxyz(ay,by,aa,bb,Ra[1],Rb[1],R[1]) # Sy
-    S *= Sxyz(az,bz,aa,bb,Ra[2],Rb[2],R[2]) # Sz
-    S *= Na * Nb * c # Eab and normalization
-    S *= (np.pi / (aa+bb))**(3./2.)
+    S *= Sxyz(ax,bx,aa,bb,Ra[0],Rb[0],R[0]) # Overlap along x
+    S *= Sxyz(ay,by,aa,bb,Ra[1],Rb[1],R[1]) # Overlap along y
+    S *= Sxyz(az,bz,aa,bb,Ra[2],Rb[2],R[2]) # Overlap along z
+    S *= Na * Nb * c # Product coefficient and normalization
+    S *= (np.pi / (aa+bb))**(3./2.) # Normalization
 
     return S
 
 def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     """
-    Compute kinetic integral between two Cartesian gaussian functions
+    Compute kinetic integral between two Cartesian gaussian functions.
+
+    INPUT:
+        AX: Angular momentum lx for Gaussian 1
+        AY: Angular momentum ly for Gaussian 1
+        AZ: Angular momentum lz for Gaussian 1
+        AA: Exponential coefficient for Gaussian 1
+        BX: Angular momentum lx for Gaussian 2
+        BY: Angular momentum ly for Gaussian 2
+        BZ: Angular momentum lz for Gaussian 2
+        BB: Exponential coefficient for Gaussian 2
+        RA: Center of Gaussian 1
+        RB: Center of Gaussian 2
+    OUTPUT:
+        K: Kinetic integral between the two gaussians
 
     Source:
         The Mathematica Journal
@@ -84,6 +189,34 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
     R,c = gaussian_product(aa,bb,Ra,Rb)
 
     def Kxyz(ac,a1,a2,bc,b1,b2,aa,bb,Ra,Rb,Ra1,Rb1,Ra2,Rb2,Rc,R1,R2):
+        """
+            Compute kinetic integral between two Cartesian gaussian functions along one direction.
+
+            INPUT:
+                AC: Component of angular momentum for Gaussian 1 along direction of interest
+                A1: Component of angular momentum for Gaussian 1 along second direction
+                A2: Component of angular momentum for Gaussian 1 along third direction
+                BC: Component of angular momentum for Gaussian 2 along direction of interest
+                B1: Component of angular momentum for Gaussian 2 along second direction
+                B2: Component of angular momentum for Gaussian 2 along third direction
+                AA: Exponential coefficient for Gaussian 1
+                BB: Exponential coefficient for Gaussian 2
+                RA: Component of the center of Gaussian 1 along direction of interest
+                RB: Component of the center of Gaussian 2 along direction of interest
+                RA1: Component of the center of Gaussian 1 along second direction
+                RA2: Component of the center of Gaussian 1 along third direction
+                RB1: Component of the center of Gaussian 2 along second direction
+                RB2: Component of the center of Gaussian 2 along third direction
+            OUTPUT:
+                KC: Kinetic integral between two gaussians along chosen direction
+
+            Source:
+                The Mathematica Journal
+                Evaluation of Gaussian Molecular Integrals
+                II. Kinetic-Energy Integrals
+                Minhhuy Hô and Julio Manuel Hernández-Pérez
+        """
+
         kc = 0
         kc += ac * bc * Sxyz(ac-1,bc-1,aa,bb,Ra,Rb,Rc)
         kc += -2 * aa * bc * Sxyz(ac+1,bc-1,aa,bb,Ra,Rb,Rc)
@@ -98,14 +231,15 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
 
         return Kc
 
-    Kx = Kxyz(ax,ay,az,bx,by,bz,aa,bb,Ra[0],Rb[0],Ra[1],Rb[1],Ra[2],Rb[2],R[0],R[1],R[2])
-    Ky = Kxyz(ay,az,ax,by,bz,bx,aa,bb,Ra[1],Rb[1],Ra[2],Rb[2],Ra[0],Rb[0],R[1],R[2],R[0])
-    Kz = Kxyz(az,ax,ay,bz,bx,by,aa,bb,Ra[2],Rb[2],Ra[0],Rb[0],Ra[1],Rb[1],R[2],R[0],R[1])
+    # Cyclic permutation of the entries
+    Kx = Kxyz(ax,ay,az,bx,by,bz,aa,bb,Ra[0],Rb[0],Ra[1],Rb[1],Ra[2],Rb[2],R[0],R[1],R[2]) # Kinetic integral along x
+    Ky = Kxyz(ay,az,ax,by,bz,bx,aa,bb,Ra[1],Rb[1],Ra[2],Rb[2],Ra[0],Rb[0],R[1],R[2],R[0]) # Kinetic integral along y
+    Kz = Kxyz(az,ax,ay,bz,bx,by,aa,bb,Ra[2],Rb[2],Ra[0],Rb[0],Ra[1],Rb[1],R[2],R[0],R[1]) # Kinetic integral along z
 
-    Na = norm(ax,ay,az,aa)
-    Nb = norm(bx,by,bz,bb)
+    Na = norm(ax,ay,az,aa) # Normalization factor for Gaussian 1
+    Nb = norm(bx,by,bz,bb) # Normalization factor for Gaussian 2
 
-    K = (Kx + Ky + Kz) * Na * Nb
+    K = (Kx + Ky + Kz) * Na * Nb # Normalization of total kinetic energy integral
 
     return K
 
@@ -134,53 +268,37 @@ def f(j,l,m,a,b):
     return f
 
 def F(nu,x):
+    """
+    Boys function.
+
+    INPUT:
+        NU: Boys function index
+        X: Boys function variable
+
+    OUTPUT:
+        FF: Value of the Boys function for index NU evaluated at X
+
+    Source:
+        Evaluation of the Boys Function using Analytical Relations
+        I. I. Guseinov and B. A. Mamedov
+        Journal of Mathematical Chemistry
+        2006
+    """
 
     if x < 1e-8:
+        # Taylor expansion for argument close or equal to zero (avoid division by zero)
         ff =  1 / (2 * nu + 1) - x / (2 * nu + 3)
     else:
+        # Evaluate Boys function with incomplete and complete Gamma functions
         ff = 0.5 / x**(nu+0.5) * spec.gamma(nu+0.5)*spec.gammainc(nu+0.5,x)
 
-    #print(ff)
-
     return ff
-
-    """
-    def f(t):
-        return t**(2*nu) * np.exp(-x*t**2)
-
-    F = quad.quad(f,0,1,epsabs=1e-12,epsrel=1e-12,limit=500)[0]
-    return F
-    """
-    """
-    if x < 1e-8:
-        return 1 / (2 * nu + 1) - x / (2 * nu + 3)
-    else x >= 1e-8 and x < 35:
-        prod = (2*nu+1)
-        ss = 1 / prod
-        ssold = 0
-
-        idx = 1
-        while abs(ss-ssold) > 1e-12:
-            ssold = ss
-
-            prod *= 2*nu + 2 * idx + 1
-
-            ss += (2*x)**idx / prod
-
-            idx += 1
-
-        return ss * np.exp(-x)
-    """
-
-
-
-
 
 def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
     """
     Compute nuclear-electron interaction integrals.
 
-
+    INPUT:
     AX,AY,AZ: Angular momentum components for the first Gaussian.
     BX,BY,BZ: Angular momentum components for the second Gaussian.
     AA: Exponential coefficient for the first Gaussian.
@@ -274,6 +392,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
         1998
 
         ERRATA (the original formula is WRONG)!
+            http://spider.shef.ac.uk/
     """
 
 
