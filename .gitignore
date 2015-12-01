@@ -12,3 +12,5 @@ __pycache__/matrices2.cpython-34.pyc
 __pycache__/integrals2.cpython-34.pyc
 
 *.in
+
+*.x
