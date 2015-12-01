@@ -245,7 +245,7 @@ def kinetic(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb):
 
 def f(j,l,m,a,b):
     """
-    Expansion coefficient.
+    Expansion coefficient f.
 
     Source:
         Handbook of Computational Chemistry
@@ -318,12 +318,23 @@ def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
 
     Vn = 0
 
+    # Intermediate variable
     g = aa + bb
     eps = 1. / (4 * g)
 
-    Rp,c = gaussian_product(aa,bb,Ra,Rb)
+    Rp,c = gaussian_product(aa,bb,Ra,Rb) # Gaussian product
 
     def A(l,r,i,l1,l2,Ra,Rb,Rc,Rp):
+        """
+        Expansion coefficient A.
+
+        Source:
+            Handbook of Computational Chemistry
+            David Cook
+            Oxford University Press
+            1998
+        """
+
         A = 1
         A *= (-1)**(l)
         A *= f(l,l1,l2,Rp-Ra,Rp-Rb)
@@ -352,12 +363,13 @@ def nuclear(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb,Rn,Zn):
                                     for k in range(0,int((n-2*t)/2)+1):
                                         Az =  A(n,t,k,az,bz,Ra[2],Rb[2],Rn[2],Rp[2])
 
-                                        nu = l + m + n - 2 * (r + s + t) - (i + j + k)
+                                        nu = l + m + n - 2 * (r + s + t) - (i + j + k) # Index of Boys function
 
-                                        ff = F(nu,g*np.dot(Rp-Rn,Rp-Rn))
+                                        ff = F(nu,g*np.dot(Rp-Rn,Rp-Rn)) # Boys function
 
                                         Vn += Ax * Ay * Az * ff
 
+    # Compute normalization
     Na = norm(ax,ay,az,aa)
     Nb = norm(bx,by,bz,bb)
 
@@ -370,19 +382,21 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
     """
     Compute electron-electron interaction integrals.
 
-
-    AX,AY,AZ: Angular momentum components for the first Gaussian.
-    BX,BY,BZ: Angular momentum components for the second Gaussian.
-    CX,CY,CZ: Angular momentum components for the third Gaussian.
-    DX,DY,DZ: Angular momentum components for the fourth Gaussian.
-    AA: Exponential coefficient for the first Gaussian.
-    BB: Exponential coefficient for the second Gaussian.
-    CC: Exponential coefficient for the third Gaussian.
-    DD: Exponential coefficient for the fourth Gaussian.
-    RA: Center of the first Gaussian.
-    RB: Center of the second Gaussian.
-    RC: Center of the third Gaussian.
-    RD: Center of the fourth Gaussian.
+    INPUT:
+        AX,AY,AZ: Angular momentum components for the first Gaussian.
+        BX,BY,BZ: Angular momentum components for the second Gaussian.
+        CX,CY,CZ: Angular momentum components for the third Gaussian.
+        DX,DY,DZ: Angular momentum components for the fourth Gaussian.
+        AA: Exponential coefficient for the first Gaussian.
+        BB: Exponential coefficient for the second Gaussian.
+        CC: Exponential coefficient for the third Gaussian.
+        DD: Exponential coefficient for the fourth Gaussian.
+        RA: Center of the first Gaussian.
+        RB: Center of the second Gaussian.
+        RC: Center of the third Gaussian.
+        RD: Center of the fourth Gaussian.
+    OUTPUT:
+        G: Electron-electron integral
 
     Source:
 
@@ -398,15 +412,27 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
     G = 0
 
+    # Intermediate variable
     g1 = aa + bb
     g2 = cc + dd
 
+    # Compute gaussian products
     Rp, c1 = gaussian_product(aa,bb,Ra,Rb)
     Rq, c2 = gaussian_product(cc,dd,Rc,Rd)
 
     delta = 1 / (4 * g1) + 1 / (4 * g2)
 
     def theta(l,l1,l2,a,b,r,g):
+        """
+        Expansion coefficient theta.
+
+        Source:
+            Handbook of Computational Chemistry
+            David Cook
+            Oxford University Press
+            1998
+        """
+
         t = 1
         t *= f(l,l1,l2,a,b)
         t *= misc.factorial(l,exact=True)
@@ -417,6 +443,16 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 
 
     def B(l,ll,r,rr,i,l1,l2,Ra,Rb,Rp,g1,l3,l4,Rc,Rd,Rq,g2):
+        """
+        Expansion coefficient B.
+
+        Source:
+            Handbook of Computational Chemistry
+            David Cook
+            Oxford University Press
+            1998
+        """
+
         b = 1
         b *= (-1)**(l) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
         b *= theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2)
@@ -460,7 +496,7 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
                                                                 G += Bx * By * Bz * ff
 
 
-
+    # Compute normalization
     Na = norm(ax,ay,az,aa)
     Nb = norm(bx,by,bz,bb)
     Nc = norm(cx,cy,cz,cc)
@@ -474,6 +510,11 @@ def electronic(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd):
 def EE_list(basis):
     """
     Multidimensional array of two-electron integrals.
+
+    INPUT:
+        BASIS: Basis set
+    OUTPUT:
+        EE: list of two-electron integrals, with indices (i,j,k,l)
     """
 
     # Size of the basis set
@@ -493,6 +534,7 @@ def EE_list(basis):
 
                     Nee += 1
 
+                    # Print update of calculation (can be long)
                     if Nee % 500 == 0:
                         print("     Computed ", Nee, " two-electron integrals of ", K**4, ".",sep='')
 
@@ -501,23 +543,28 @@ def EE_list(basis):
                         for a2,d2 in zip(b2["a"],b2["d"]):
                             for a3,d3 in zip(b3["a"],b3["d"]):
                                 for a4,d4 in zip(b4["a"],b4["d"]):
+                                    # Basis functions centers
                                     R1 = b1["R"]
                                     R2 = b2["R"]
                                     R3 = b3["R"]
                                     R4 = b4["R"]
 
+                                    # Basis functions angular momenta
                                     ax = b1["lx"]
                                     ay = b1["ly"]
                                     az = b1["lz"]
 
+                                    # Basis functions angular momenta
                                     bx = b2["lx"]
                                     by = b2["ly"]
                                     bz = b2["lz"]
 
+                                    # Basis functions angular momenta
                                     cx = b3["lx"]
                                     cy = b3["ly"]
                                     cz = b3["lz"]
 
+                                    # Basis functions angular momenta
                                     dx = b4["lx"]
                                     dy = b4["ly"]
                                     dz = b4["lz"]
@@ -532,6 +579,12 @@ def EE_list(basis):
     return EE
 
 def print_EE_list(ee):
+    """
+    Print list of electron-electron integrals.
+
+    INPUT:
+        EE: list of electron-electron integrals (computed by EE_LIST function)
+    """
 
     K = ee.shape[0]
 
@@ -552,15 +605,16 @@ if __name__ == "__main__":
         1989
     """
 
+    # System: HeH+
     HeH = [Atom("He",(0,0,1.4632),2,["1s"]),Atom("H",(0,0,0),1,["1s"])]
 
-    sto3g_HeH = STO3G(HeH)
+    sto3g_HeH = STO3G(HeH) # Create basis set
 
-    ee_HeH = EE_list(sto3g_HeH)
+    ee_HeH = EE_list(sto3g_HeH) # Compute electron-electron integrals for HeH+
 
     print("######################")
     print("Two electron integrals")
     print("######################")
 
     print("\n HeH")
-    print_EE_list(ee_HeH)
+    print_EE_list(ee_HeH) # Print electron-electron integrals

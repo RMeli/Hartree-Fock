@@ -1,3 +1,20 @@
+"""
+    Copyright (C) 2015 Rocco Meli
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from basis import *
 from integrals import *
 
@@ -7,8 +24,12 @@ def S_overlap(basis):
     """
     Compute overlap matrix S.
 
-    BASIS: basis set.
+    INPUT:
+        BASIS: basis set
+    OUTPUT:
+        S: Overlap matrix
     """
+
     # Size of the basis set
     K = basis.K
 
@@ -35,7 +56,16 @@ def X_transform(S):
     """
     Compute the transformation matrix X using canonical orthogonalization.
 
-    S: Overlap matrix.
+    INPUT:
+        S: Overlap matrix
+    OUTPUT:
+        X: Transformation matrix
+
+    Source:
+        Modern Quantum Chemistry
+        Szabo and Ostlund
+        Dover
+        1989
     """
 
     s, U = la.eig(S)
@@ -50,7 +80,10 @@ def T_kinetic(basis):
     """
     Compute kinetic matrix T.
 
-    BASIS: basis set.
+    INPUT:
+        BASIS: basis set
+    OUTPUT:
+        T: Kinetic matrix
     """
     # Size of the basis set
     K = basis.K
@@ -78,9 +111,11 @@ def V_nuclear(basis,atom):
     """
     Compute nuclear-electron potential energy matrix Vn.
 
-    BASIS: basis set.
-    RN: Nuclear position.
-    ZN: Nuclear charge.
+    INPUT:
+        BASIS: basis set
+        ATOM: atom specifications (position and charge)
+    OUTPUT:
+        VN: Nuclear-attraction matrix for atom ATOM
     """
     # Size of the basis set
     K = basis.K
@@ -112,6 +147,15 @@ def V_nuclear(basis,atom):
     return Vn
 
 def H_core(basis,molecule):
+    """
+    Compute core Hamiltonian (sum of T and all the VN)
+
+    INPUT:
+        BASIS: basis set
+        MOLECULE: molecule, collection of atom objects
+    OUTPUT:
+        (T + VN): Core Hamitlonian
+    """
     T = T_kinetic(basis)
 
     print("Kinetic energy")
@@ -141,7 +185,17 @@ def P_density(C,N):
     """
     Compute dansity matrix.
 
-    C: Coefficients matrix.
+    INPUT:
+        C: Matrix of coefficients
+        N: Number of electrons
+    OUTPUT:
+        P: density matrix
+
+    Source:
+        Modern Quantum Chemistry
+        Szabo and Ostlund
+        Dover
+        1989
     """
 
     # Size of the basis set
@@ -160,10 +214,13 @@ def G_ee(basis,molecule,P,ee):
     """
     Compute core Hamiltonian matrix.
 
-    BASIS: Basis set.
-    MOLECULE: Collection of atoms
-    P: Density matrix
-    EE: Two-electron integrals
+    INPUT:
+        BASIS: Basis set.
+        MOLECULE: Collection of atoms
+        P: Density matrix
+        EE: Two-electron integrals
+    OUTPUT:
+        G: Electron-electron interaction matrix
     """
 
     # Size of the basis set

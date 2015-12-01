@@ -1,14 +1,53 @@
+"""
+    Copyright (C) 2015 Rocco Meli
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+
 class Atom:
+    """
+    Class representing an atom.
+    """
+
     def __init__(self,name,R,Z,orbitals):
+        """
+        Initializer for ATOM
+
+        INPUT:
+            NAME: Name of the element
+            R: Position (cartesian coordinates, atomic units)
+            Z: Atomic charge
+            ORBITALS: list of orbitals for this atom
+        """
+
         self.name = name
         self.R = R
         self.orbitals = orbitals
         self.Z = Z
 
 class STO3G():
+    """
+    STO-3G minima basis set.
+    """
     def __init__(self,atoms):
-
         """
+        Initializer for STO3G
+
+        INPUT:
+            ATOMS: list of atoms
+
         Source
 
             Modern Quantum Chemistry
@@ -17,6 +56,7 @@ class STO3G():
             1989
         """
 
+        # Exponential coefficients for the Gaussian orbitals
         self.zeta1 = {  "H":1.24,
                         "He":2.0925,
                         "Li":2.69,
@@ -36,8 +76,8 @@ class STO3G():
 
         self.STO3G = []
 
-        for a in atoms:
-            for o in a.orbitals:
+        for a in atoms: # For every atom
+            for o in a.orbitals: # For every atomic orbital
                 if o == "1s":
                     a1 = 0.109818 * self.zeta1[a.name]**2
                     a2 = 0.405771 * self.zeta1[a.name]**2
@@ -108,9 +148,16 @@ class STO3G():
             self.K = len(self.STO3G)
 
     def basis(self):
+        """
+        Return the basis set.
+        """
+        
         return self.STO3G
 
     def info(self):
+        """
+        Print informations about the bais set.
+        """
         print("########################")
         print("STO-3G MINIMAL BASIS SET")
         print("########################\n")
