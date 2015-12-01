@@ -65,8 +65,8 @@ if verbose:
 print("Computing two-electron integrals...")
 ee = EE_list(bs)
 
-    if verbose:
-        print_EE_list(ee)
+if verbose:
+    print_EE_list(ee)
 
 Pnew = np.zeros((K,K))
 P = np.zeros((K,K))

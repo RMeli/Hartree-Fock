@@ -61,7 +61,7 @@ MODULE ELECTRONIC
             REAL*8 :: B
 
             B = 1.0D0
-            B = B * (-1)**(ll) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
+            B = B * (-1)**(l) * theta(l,l1,l2,Rp-Ra,Rp-Rb,r,g1)
             B = B * theta(ll,l3,l4,Rq-Rc,Rq-Rd,rr,g2) * (-1)**i
             B = B * (2.0D0*delta)**(2*(r+rr)) * factorial(l + ll - 2 * r - 2 * rr)
             B = B * delta**i * (Rp-Rq)**(l+ll - 2*(r+rr+i))
