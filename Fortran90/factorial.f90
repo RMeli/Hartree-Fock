@@ -75,7 +75,9 @@ MODULE FACT
             ! OUTPUT
             INTEGER :: binom
 
-            binom = factorial(n) / (factorial(k) * factorial(n-k))
+            binom = factorial(n)
+            binom = binom / factorial(k)
+            binom = binom / factorial(n-k)
 
         END FUNCTION binom
 
