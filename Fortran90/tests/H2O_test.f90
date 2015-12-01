@@ -1,4 +1,4 @@
-PROGRAM HF_H2
+PROGRAM HF_H2O
 
     USE RHF
     USE OVERLAP, only: S_overlap, X_transform
@@ -80,4 +80,4 @@ PROGRAM HF_H2
 
     CALL SCF(K,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
 
-END PROGRAM HF_H2
+END PROGRAM HF_H2O
