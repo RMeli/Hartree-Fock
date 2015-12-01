@@ -106,13 +106,14 @@ MODULE RHF
         ! ---------
         ! SCF Cycle
         ! ---------
-        SUBROUTINE SCF(Kf,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
+        SUBROUTINE RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
             ! --------------------------------
             ! Compute total energy (SCF cycle)
             ! --------------------------------
 
             ! INPUT
             INTEGER, intent(in) :: Kf                                   ! Basis set size
+            INTEGER, intent(in) :: c                                    ! Number of contractions
             INTEGER, intent(in) :: Ne                                   ! Number of electrons
             INTEGER, intent(in) :: Nn                                   ! Number of nuclei
             INTEGER, dimension(Kf,3), intent(in) :: basis_L              ! Angular momenta of basis set Gaussians
@@ -123,7 +124,7 @@ MODULE RHF
             LOGICAL, intent(in) :: verbose                              ! Verbose flag
 
             ! OUTPUT
-            REAL*8,intent(out) :: final_E                                              ! Converged total energy
+            REAL*8,intent(out) :: final_E ! Converged total energy
 
             ! --------
             ! MATRICES
@@ -154,7 +155,7 @@ MODULE RHF
             ! HF INITIALIZATION
             ! -----------------
 
-            CALL S_overlap(Kf,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
+            CALL S_overlap(Kf,c,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
 
             IF (verbose) THEN
                 WRITE(*,*) "Overlap matrix S:"
@@ -168,14 +169,14 @@ MODULE RHF
                 CALL print_real_matrix(Kf,Kf,X)
             END IF
 
-            CALL H_core(Kf,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
+            CALL H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
 
             IF (verbose) THEN
                 WRITE(*,*) "Core Hamiltonian Hc:"
                 CALL print_real_matrix(Kf,Kf,Hc)
             END IF
 
-            CALL EE_list(Kf,basis_D,basis_A,basis_L,basis_R,ee)
+            CALL EE_list(Kf,c,basis_D,basis_A,basis_L,basis_R,ee)
 
             IF (verbose) THEN
                 CALL print_ee_list(Kf,ee)
@@ -221,7 +222,7 @@ MODULE RHF
 
             END DO ! SCF
 
-        END SUBROUTINE SCF
+        END SUBROUTINE RHF_SCF
 
 
 END MODULE RHF

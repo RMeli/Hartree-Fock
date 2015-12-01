@@ -91,7 +91,7 @@ MODULE OVERLAP
         ! -------------
         ! OVERLAP MARIX
         ! -------------
-        SUBROUTINE S_overlap(Kf,basis_D,basis_A,basis_L,basis_R,S)
+        SUBROUTINE S_overlap(Kf,c,basis_D,basis_A,basis_L,basis_R,S)
             ! ----------------------------------------------
             ! Compute overlap matrix between basis function.
             ! ----------------------------------------------
@@ -99,8 +99,7 @@ MODULE OVERLAP
             IMPLICIT NONE
 
             ! TODO Allow flexibility for basis sets other than STO-3G
-            ! HARD CODED
-            INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
+            INTEGER, intent(in) :: c ! Number of contractions per basis function
 
             ! INPUT
             INTEGER, intent(in) :: Kf ! Number of basis functions

@@ -85,7 +85,7 @@ MODULE KINETIC
         ! --------------
         ! KINETIC MATRIX
         ! --------------
-        SUBROUTINE T_kinetic(Kf,basis_D,basis_A,basis_L,basis_R,T)
+        SUBROUTINE T_kinetic(Kf,c,basis_D,basis_A,basis_L,basis_R,T)
             ! ----------------------------------------------
             ! Compute kinetic matrix between basis function.
             ! ----------------------------------------------
@@ -93,8 +93,7 @@ MODULE KINETIC
             IMPLICIT NONE
 
             ! TODO Allow flexibility for basis sets other than STO-3G
-            ! HARD CODED
-            INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
+            INTEGER, intent(in) :: c ! Number of contractions per basis function
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions

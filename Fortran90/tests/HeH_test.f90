@@ -1,10 +1,10 @@
 PROGRAM HF
 
     USE RHF
-    USE UTILS
-    USE CONSTANTS
 
     IMPLICIT NONE
+
+    INTEGER, PARAMETER :: c = 3
 
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
     REAL*8, PARAMETER :: zeta_He = 2.0925D0 ! STO coefficient correction for He
@@ -53,6 +53,6 @@ PROGRAM HF
     ! TOTAL ENERGY CALCULATION
     ! ------------------------
 
-    CALL SCF(K,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
+    CALL RHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
 
 END PROGRAM HF

@@ -168,13 +168,12 @@ MODULE ELECTRONIC
         ! ---------------------------------------
         ! GENERATE LIST OF TWO-ELECTRON INTEGRALS
         ! ---------------------------------------
-        SUBROUTINE ee_list(Kf,basis_D,basis_A,basis_L,basis_R,ee)
+        SUBROUTINE ee_list(Kf,c,basis_D,basis_A,basis_L,basis_R,ee)
 
             IMPLICIT NONE
 
             ! TODO Allow flexibility for basis sets other than STO-3G
-            ! HARD CODED
-            INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
+            INTEGER, intent(in) :: c ! Number of contractions per basis function
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions

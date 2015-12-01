@@ -8,11 +8,11 @@ MODULE CORE
 
     CONTAINS
 
-        SUBROUTINE H_core(Kf,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,H)
+        SUBROUTINE H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,H)
 
             ! TODO Allow flexibility for basis sets other than STO-3G
-            ! HARD CODED
-            INTEGER, PARAMETER :: c = 3 ! Number of contractions per basis function
+            INTEGER, intent(in) :: c ! Number of contractions per basis function
+
             LOGICAL, PARAMETER :: verbose = .TRUE.
 
             ! INPUT
@@ -37,7 +37,7 @@ MODULE CORE
 
             V(:,:) = 0.0D0
 
-            CALL T_kinetic(Kf,basis_D,basis_A,basis_L,basis_R,H)
+            CALL T_kinetic(Kf,c,basis_D,basis_A,basis_L,basis_R,H)
 
             IF (verbose) THEN
                 WRITE(*,*) "Kinetic energy matrix T:"
@@ -47,7 +47,7 @@ MODULE CORE
             DO i = 1, Nn
                 M(:,:) = 0.0D0
 
-                CALL V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,M,Rn(i,1:3),Zn(i))
+                CALL V_nuclear(Kf,c,basis_D,basis_A,basis_L,basis_R,M,Rn(i,1:3),Zn(i))
 
                 IF (verbose) THEN
                     WRITE(*,*) "Nuclear attraction matrix V:", i

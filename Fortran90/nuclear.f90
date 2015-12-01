@@ -318,7 +318,7 @@ MODULE NUCLEAR
         ! --------------------------------
         ! NUCLEUS-ELECRON POTENTIAL MATRIX
         ! --------------------------------
-        SUBROUTINE V_nuclear(Kf,basis_D,basis_A,basis_L,basis_R,Vn,Rnn,Znn)
+        SUBROUTINE V_nuclear(Kf,c,basis_D,basis_A,basis_L,basis_R,Vn,Rnn,Znn)
             ! ------------------------------------------
             ! Compute nucleus-electrona potential matrix
             ! ------------------------------------------
@@ -327,6 +327,7 @@ MODULE NUCLEAR
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions
+            INTEGER, intent(in) :: c                        ! Number of contractions (TODO)
             REAL*8, dimension(Kf,3), intent(in) :: basis_R  ! Basis set niclear positions
             INTEGER, dimension(Kf,3), intent(in) :: basis_L ! Basis set angular momenta
             REAL*8, dimension(Kf,c), intent(in) :: basis_D  ! Basis set contraction coefficients

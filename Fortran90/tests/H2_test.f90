@@ -1,15 +1,10 @@
 PROGRAM HF_H2
 
     USE RHF
-    USE OVERLAP, only: S_overlap, X_transform
-    USE CORE, only: H_core
-    USE ELECTRONIC, only: EE_list
-    USE DENSITY, only: delta_P
-    USE ENERGY, only: E_tot
-    USE UTILS
-    USE CONSTANTS
 
     IMPLICIT NONE
+
+    INTEGER, PARAMETER :: c = 3
 
     REAL*8, PARAMETER :: zeta_H = 1.24D0    ! STO coefficient correction for H
 
@@ -55,6 +50,6 @@ PROGRAM HF_H2
     ! TOTAL ENERGY CALCULATION
     ! ------------------------
 
-    CALL SCF(K,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
+    CALL RHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
 
 END PROGRAM HF_H2
