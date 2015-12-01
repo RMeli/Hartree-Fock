@@ -69,7 +69,6 @@ MODULE ELECTRONIC
 
         END FUNCTION B
 
-
         FUNCTION electronic_coeff(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz,aa,bb,cc,dd,Ra,Rb,Rc,Rd) result(G)
             !--------------------------------------------------------------------------
             ! Compute electron-electron integral between two cartesia Gaussian function
