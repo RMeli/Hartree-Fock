@@ -175,7 +175,7 @@ class STO3G():
 
 if __name__ == "__main__":
 
-    """
+    u"""
     Results compared with
 
         Modern Quantum Chemistry

@@ -20,14 +20,18 @@ class IO:
         # Occupied orbitals
         self.orbitals = {   "H" : ["1s"],
                             "He" : ["1s"],
+                            "C" : ["1s","2s","2p"],
                             "N" : ["1s","2s","2p"],
-                            "O" : ["1s","2s","2p"]}
+                            "O" : ["1s","2s","2p"],
+                            "F" : ["1s","2s","2p"]}
 
         # Nuclear charges
         self.charges = {    "H" : 1,
                             "He" : 2,
+                            "C" : 6,
                             "N" : 7,
-                            "O" : 8 }
+                            "O" : 8,
+                            "F" : 9 }
 
         self.read() # Read from file
 
@@ -115,3 +119,9 @@ if __name__ == "__main__":
 
     io = IO(sys.argv[1]) # Open file as argument
     io.fortran_input()
+
+    fin = os.path.splitext(sys.argv[1])[0] + "_f.in"
+
+    os.system("./HF.x " + fin)
+
+    os.system("rm " + fin)
