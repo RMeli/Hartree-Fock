@@ -4,7 +4,7 @@ MODULE INPUT
 
     CONTAINS
 
-        SUBROUTINE load(fname,Ne,Nn,K,c,R,basis_R,basis_L,basis_A,basis_D)
+        SUBROUTINE load(fname,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D)
 
             IMPLICIT NONE
 
@@ -19,7 +19,8 @@ MODULE INPUT
             INTEGER :: i ! Loop index
 
             ! ALLOCATABLE
-            REAL*8, allocatable, dimension(:,:) :: R            ! Atomic potisions
+            REAL*8, allocatable, dimension(:,:) :: Rn           ! Atomic potisions
+            INTEGER, allocatable, dimension(:) :: Zn            ! Atomic chatges
             REAL*8, allocatable, dimension(:,:) :: basis_R      ! Basis functions' centers
             INTEGER, allocatable, dimension(:,:) :: basis_L     ! Basis functions' angular momenta
             REAL*8, allocatable, dimension(:,:) :: basis_A      ! Contraction exponential coefficients
@@ -34,7 +35,8 @@ MODULE INPUT
             READ(100,*) C
 
             ! Allocate arrays once we know system's and basis set's specifications (Ne,Nn,K,c)
-            ALLOCATE(R(Nn,3))
+            ALLOCATE(Rn(Nn,3))
+            ALLOCATE(Zn(Nn))
             ALLOCATE(basis_R(K,3))
             ALLOCATE(basis_L(K,3))
             ALLOCATE(basis_A(K,c))
@@ -42,7 +44,7 @@ MODULE INPUT
 
             ! Read atomic positions
             DO i = 1, Nn
-                READ(100,*) R(i,:)
+                READ(100,*) Rn(i,:), Zn(i)
             END DO
 
             ! Read basis set informations

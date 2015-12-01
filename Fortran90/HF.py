@@ -71,7 +71,9 @@ class IO:
             Ry = "%+.10e" % float(a.R[1])
             Rz = "%+.10e" % float(a.R[2])
 
-            line = Rx + ' ' + Ry + ' ' + Rz + os.linesep
+            Z = "%i" % a.Z
+
+            line = Rx + ' ' + Ry + ' ' + Rz + ' ' + Z +os.linesep
 
             self.ofile.write(line)
 
