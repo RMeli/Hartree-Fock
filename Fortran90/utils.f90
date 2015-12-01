@@ -24,6 +24,23 @@ MODULE UTILS
 
     END SUBROUTINE print_real_matrix
 
+    SUBROUTINE print_integer_matrix(r,c,M)
+
+        IMPLICIT NONE
+
+        ! INPUT
+        INTEGER, intent(in) :: r, c
+        INTEGER, dimension(r,c), intent(in) :: M
+
+        ! VARIABLES
+        INTEGER :: i
+
+        DO i = 1, r
+            WRITE(*,'(20I16)') M(i,1:c)
+        END DO
+
+    END SUBROUTINE print_integer_matrix
+
     ! --------------------------------------
     ! PRINT ELECTRON-ELECTRON INTEGRALS LIST
     ! --------------------------------------
