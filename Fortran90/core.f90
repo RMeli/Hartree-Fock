@@ -8,12 +8,12 @@ MODULE CORE
 
     CONTAINS
 
-        SUBROUTINE H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,H)
+        SUBROUTINE H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,H,verbose)
 
             ! TODO Allow flexibility for basis sets other than STO-3G
             INTEGER, intent(in) :: c ! Number of contractions per basis function
 
-            LOGICAL, PARAMETER :: verbose = .TRUE.
+            LOGICAL, intent(in):: verbose
 
             ! INPUT
             INTEGER, intent(in) :: Kf                       ! Number of basis functions
