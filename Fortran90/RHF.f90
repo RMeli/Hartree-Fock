@@ -111,6 +111,8 @@ MODULE RHF
             ! Compute total energy (SCF cycle)
             ! --------------------------------
 
+            IMPLICIT NONE
+
             ! INPUT
             INTEGER, intent(in) :: Kf                                   ! Basis set size
             INTEGER, intent(in) :: c                                    ! Number of contractions
@@ -147,9 +149,19 @@ MODULE RHF
             ! SCF PARAMETERS
             ! --------------
 
-            LOGICAL :: converged = .FALSE.          ! Convergence parameter
+            LOGICAL :: converged                    ! Convergence parameter
             INTEGER, PARAMETER :: maxiter = 100     ! Maximal number of iterations
-            INTEGER :: step = 0                 !    SCF steps counter
+            INTEGER :: step                         ! SCF steps counter
+
+            !!!
+            !!! NEVER INITIALIZE ON DECLARATION
+            !!! "A local variable that is initialized when declared has an implicit save attribute.
+            !!! The variable is initialized only the first time the unction is called.
+            !!! On subsequent calls the old value is retained."
+            !!!
+
+            converged = .FALSE.
+            step = 0
 
             ! -----------------
             ! HF INITIALIZATION
@@ -169,7 +181,7 @@ MODULE RHF
                 CALL print_real_matrix(Kf,Kf,X)
             END IF
 
-            CALL H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc)
+            CALL H_core(Kf,c,Nn,basis_D,basis_A,basis_L,basis_R,Rn,Zn,Hc,verbose)
 
             IF (verbose) THEN
                 WRITE(*,*) "Core Hamiltonian Hc:"
@@ -179,6 +191,7 @@ MODULE RHF
             CALL EE_list(Kf,c,basis_D,basis_A,basis_L,basis_R,ee)
 
             IF (verbose) THEN
+                WRITE(*,*) "Two-electron integrals:"
                 CALL print_ee_list(Kf,ee)
             END IF
 
@@ -189,12 +202,17 @@ MODULE RHF
             ! SCF CYCLES
             ! ----------
 
-            IF (verbose) THEN
-                WRITE(*,*) "SCF step #", step
-            END IF
-
             DO WHILE ((converged .EQV. .FALSE.) .AND. step .LT. maxiter)
                 step = step + 1
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*)
+                    WRITE(*,*)
+                    WRITE(*,*) "--------"
+                    WRITE(*,*) "SCF step #", step
+                    WRITE(*,*) "--------"
+                END IF
 
                 CALL RHF_step(Kf,Ne,Hc,X,ee,Pold,Pnew,F,E,verbose)
 
