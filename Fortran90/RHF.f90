@@ -12,6 +12,9 @@ MODULE RHF
 
     CONTAINS
 
+        ! --------
+        ! SCF STEP
+        ! --------
         SUBROUTINE RHF_step(Kf,Ne,H,X,ee,Pold,Pnew,F,orbitalE,verbose)
 
             IMPLICIT NONE
@@ -150,7 +153,7 @@ MODULE RHF
             ! --------------
 
             LOGICAL :: converged                    ! Convergence parameter
-            INTEGER, PARAMETER :: maxiter = 100     ! Maximal number of iterations
+            INTEGER, PARAMETER :: maxiter = 250     ! Maximal number of iterations (TODO: user defined maxiter)
             INTEGER :: step                         ! SCF steps counter
 
             !!!
@@ -198,9 +201,9 @@ MODULE RHF
             Pold(:,:) = 0.0D0
             Pnew(:,:) = 0.0D0
 
-            ! ----------
-            ! SCF CYCLES
-            ! ----------
+            ! ---------
+            ! SCF CYCLE
+            ! ---------
 
             DO WHILE ((converged .EQV. .FALSE.) .AND. step .LT. maxiter)
                 step = step + 1
@@ -239,6 +242,12 @@ MODULE RHF
                 Pold = Pnew
 
             END DO ! SCF
+
+            IF (converged .EQV. .FALSE.) THEN
+                WRITE(*,*)
+                WRITE(*,*) "SCF NOT CONVERGED!"
+                CALL EXIT(-1)
+            END IF
 
         END SUBROUTINE RHF_SCF
 
