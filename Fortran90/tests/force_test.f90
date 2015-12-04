@@ -26,7 +26,7 @@ PROGRAM HF_N2
     ! LOAD SYSTEM AND BASIS SET INFORMATIONS FROM FILE
     ! ------------------------------------------------
 
-    CALL load("tests/N2_f.in",Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D)
+    CALL load("tests/H2_f.in",Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D)
 
     ! -----
     ! FORCE
@@ -35,16 +35,16 @@ PROGRAM HF_N2
     ALLOCATE(F(Nn,3))
 
     ! Force on atom 1
-    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,1,F)
+    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,F,1D-4)
 
-    ! Force on atom 2
-    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,2,F)
-
+    WRITE(*,*) "######"
+    WRITE(*,*) "FORCES"
+    WRITE(*,*) "######"
     CALL print_real_matrix(Nn,3,F)
 
-    ! ---------------
-    ! ---------------
-    ! ---------------
+    ! ---
+    ! END
+    ! ---
 
     DEALLOCATE(Rn,Zn,basis_R,basis_L,basis_A,basis_D,F) ! Deallocate allocated memory
 
