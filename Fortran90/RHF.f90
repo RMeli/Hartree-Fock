@@ -1,4 +1,31 @@
+! --------------------------------------------------------------------
+!
+! Copyright (C) 2015 Rocco Meli
+!
+! This program is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! This program is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with this program.  If not, see <http://www.gnu.org/licenses/>.
+!
+! ---------------------------------------------------------------------
+
 MODULE RHF
+    ! ----------------------------------------------
+    ! RESTRICTED HARTREE-FOCK
+    ! ----------------------------------------------
+    !
+    ! Self-consistent solution of Roothaan equations
+    ! (Restricted Hartree-Fock)
+    !
+    ! ----------------------------------------------
 
     USE UTILS, only: EIGS, print_real_matrix, print_ee_list
     USE DENSITY, only: P_density, delta_P
@@ -16,6 +43,11 @@ MODULE RHF
         ! SCF STEP
         ! --------
         SUBROUTINE RHF_step(Kf,Ne,H,X,ee,Pold,Pnew,F,orbitalE,verbose)
+            ! ----------------------------------------------------------------------
+            ! Perform a single step of the SCF procedure to solve Roothan equations.
+            ! ----------------------------------------------------------------------
+            !
+            ! Source:
 
             IMPLICIT NONE
 
@@ -121,9 +153,9 @@ MODULE RHF
             INTEGER, intent(in) :: c                                    ! Number of contractions
             INTEGER, intent(in) :: Ne                                   ! Number of electrons
             INTEGER, intent(in) :: Nn                                   ! Number of nuclei
-            INTEGER, dimension(Kf,3), intent(in) :: basis_L              ! Angular momenta of basis set Gaussians
-            REAL*8, dimension(Kf,3), intent(in) :: basis_R               ! Centers of basis set Gaussians
-            REAL*8, dimension(Kf,c), intent(in) :: basis_D, basis_A      ! Basis set coefficients
+            INTEGER, dimension(Kf,3), intent(in) :: basis_L             ! Angular momenta of basis set Gaussians
+            REAL*8, dimension(Kf,3), intent(in) :: basis_R              ! Centers of basis set Gaussians
+            REAL*8, dimension(Kf,c), intent(in) :: basis_D, basis_A     ! Basis set coefficients
             REAL*8, dimension(Nn,3), intent(in) :: Rn                   ! Nuclear positions
             INTEGER, dimension(Nn), intent(in) :: Zn                    ! Nuclear charges
             LOGICAL, intent(in) :: verbose                              ! Verbose flag
@@ -132,7 +164,7 @@ MODULE RHF
             REAL*8,intent(out) :: final_E ! Converged total energy
 
             ! --------
-            ! MATRICES
+            ! Matrices
             ! --------
 
             REAL*8, dimension(Kf,Kf) :: S     ! Overlap matrix
@@ -149,7 +181,7 @@ MODULE RHF
             REAL*8, dimension(Kf) :: E           ! Orbital energies
 
             ! --------------
-            ! SCF PARAMETERS
+            ! SCF parameters
             ! --------------
 
             LOGICAL :: converged                    ! Convergence parameter
@@ -167,7 +199,7 @@ MODULE RHF
             step = 0
 
             ! -----------------
-            ! HF INITIALIZATION
+            ! HF initialization
             ! -----------------
 
             CALL S_overlap(Kf,c,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
@@ -202,7 +234,7 @@ MODULE RHF
             Pnew(:,:) = 0.0D0
 
             ! ---------
-            ! SCF CYCLE
+            ! SCF cycle
             ! ---------
 
             DO WHILE ((converged .EQV. .FALSE.) .AND. step .LT. maxiter)
