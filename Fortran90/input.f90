@@ -23,7 +23,7 @@ MODULE INPUT
 
     CONTAINS
 
-        SUBROUTINE load(fname,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D)
+        SUBROUTINE load(fname,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
             IMPLICIT NONE
 
@@ -44,6 +44,7 @@ MODULE INPUT
             INTEGER, allocatable, dimension(:,:) :: basis_L     ! Basis functions' angular momenta
             REAL*8, allocatable, dimension(:,:) :: basis_A      ! Contraction exponential coefficients
             REAL*8, allocatable, dimension(:,:) :: basis_D      ! Conttaction linear coefficients
+            INTEGER, allocatable, dimension(:) :: basis_idx     ! Basis set atom index
 
             ! Open file containing system and basis set informations
             OPEN(unit=100,file=fname,form="formatted",status="old",action="read")
@@ -60,6 +61,7 @@ MODULE INPUT
             ALLOCATE(basis_L(K,3))
             ALLOCATE(basis_A(K,c))
             ALLOCATE(basis_D(K,c))
+            ALLOCATE(basis_idx(K))
 
             ! Read atomic positions
             DO i = 1, Nn
@@ -68,7 +70,7 @@ MODULE INPUT
 
             ! Read basis set informations
             DO i = 1, K
-                READ(100,*) basis_R(i,:), basis_L(i,:), basis_A(i,:), basis_D(i,:)
+                READ(100,*) basis_R(i,:), basis_L(i,:), basis_A(i,:), basis_D(i,:), basis_idx(i)
             END DO
 
             CLOSE(unit=100) ! Close the file
