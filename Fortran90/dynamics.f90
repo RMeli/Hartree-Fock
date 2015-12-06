@@ -189,7 +189,7 @@ MODULE DYNAMICS
         ! Compute forces at new nuclear positions
         ! ---------------------------------------
 
-        CALL force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,pos,force_tdt,delta)
+        CALL force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,pos,force_tdt,delta)
 
         ! -------------------------
         ! Update nuclear velocities

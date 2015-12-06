@@ -59,14 +59,7 @@ MODULE RHF
 
             ! INPUT
             INTEGER, intent(in) :: Kf                           ! Number of basis functions
-            !INTEGER, intent(in) :: Nn                           ! Number of nuclei
             INTEGER, intent(in) :: Ne                           ! Number of electrons
-            !REAL*8, dimension(Kf,3), intent(in) :: basis_D      ! Contraction coefficients
-            !REAL*8, dimension(Kf,3), intent(in) :: basis_A      ! Contraction exponential coefficients
-            !INTEGER, dimension(Kf,3), intent(in) :: basis_L     ! Basis function angular momenta
-            !REAL*8, dimension(Kf,3), intent(in) :: basis_R      ! Basis set centers
-            !REAL*8, dimension(Nn,3), intent(in) :: Rn           ! Nuclear coordinates
-            !INTEGER, dimension(Nn), intent(in) :: Zn            ! Nuclear charges
             REAL*8, dimension(Kf,Kf), intent(in) :: H           ! Core Hamiltonian
             REAL*8, dimension(Kf,Kf), intent(in) :: X           ! Transformation maxrix
             REAL*8, dimension(Kf,Kf), intent(in) :: Pold        ! Old density matrix
@@ -195,7 +188,7 @@ MODULE RHF
             INTEGER :: step                         ! SCF steps counter
 
             !!!
-            !!! NEVER INITIALIZE ON DECLARATION
+            !!! NEVER INITIALIZE ON DECLARATION VARIABLES OTHER THAN PARAMETERS
             !!! "A local variable that is initialized when declared has an implicit save attribute.
             !!! The variable is initialized only the first time the unction is called.
             !!! On subsequent calls the old value is retained."
@@ -204,9 +197,9 @@ MODULE RHF
             converged = .FALSE.
             step = 0
 
-            ! -----------------
-            ! HF initialization
-            ! -----------------
+            ! ------------------
+            ! RHF initialization
+            ! ------------------
 
             CALL S_overlap(Kf,c,basis_D,basis_A,basis_L,basis_R,S) ! Compute overlap matrix
 
