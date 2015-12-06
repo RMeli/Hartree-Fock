@@ -27,13 +27,15 @@ MODULE RHF
     !
     ! ----------------------------------------------
 
-    USE UTILS, only: EIGS, print_real_matrix, print_ee_list
+    USE LA, only: EIGS
+    USE OUTPUT, only: print_real_matrix, print_ee_list
     USE DENSITY, only: P_density, delta_P
     USE ELECTRONIC, only: G_ee, EE_list
     USE ENERGY, only: E_tot
     USE CONSTANTS
     USE OVERLAP, only: S_overlap, X_transform
     USE CORE, only: H_core
+    USE INIT
 
     IMPLICIT NONE
 
@@ -42,7 +44,7 @@ MODULE RHF
         ! --------
         ! SCF STEP
         ! --------
-        SUBROUTINE RHF_step(Kf,Ne,H,X,ee,Pold,Pnew,F,orbitalE,verbose)
+        SUBROUTINE RHF_step(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose)
             ! ----------------------------------------------------------------------
             ! Perform a single step of the SCF procedure to solve Roothan equations.
             ! ----------------------------------------------------------------------
@@ -61,10 +63,12 @@ MODULE RHF
             INTEGER, intent(in) :: Kf                           ! Number of basis functions
             INTEGER, intent(in) :: Ne                           ! Number of electrons
             REAL*8, dimension(Kf,Kf), intent(in) :: H           ! Core Hamiltonian
+            REAL*8, dimension(Kf,Kf), intent(in) :: S           ! Overlap matrix
             REAL*8, dimension(Kf,Kf), intent(in) :: X           ! Transformation maxrix
             REAL*8, dimension(Kf,Kf), intent(in) :: Pold        ! Old density matrix
             REAL*8, dimension(Kf,Kf,Kf,Kf), intent(in) :: ee    ! Electron-electron list
             LOGICAL, intent(in) :: verbose                      ! Flag to print matrices
+            INTEGER, intent(in) :: step                         ! SCF step counter
 
             ! INTERMEDIATE VARIABLES
             REAL*8, dimension(Kf,Kf) :: G                       ! Electron-electron repulsion matrix
@@ -77,21 +81,32 @@ MODULE RHF
             REAL*8, dimension(Kf,Kf), intent(out) :: F          ! Fock operator
             REAL*8, dimension(Kf), intent(out) :: orbitalE      ! Orbital energies
 
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Density matrix P:"
-                CALL print_real_matrix(Kf,Kf,Pold)
+            IF (step .EQ. 1) THEN
+
+                ! Initial guess for Fock matrix
+                CALL huckel_guess(Kf,H,S,F,1.450D0)
+
+            ELSE
+
+                ! Compute Fock matrix using previous density matrix
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Density matrix P:"
+                    CALL print_real_matrix(Kf,Kf,Pold)
+                END IF
+
+                CALL G_ee(Kf,ee,Pold,G) ! Compute new electron-electron repulsion matrix G
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Electron-electron repulsion matrix G:"
+                    CALL print_real_matrix(Kf,Kf,G)
+                END IF
+
+                F = H + G ! Compute new Fock operator
+
             END IF
-
-            CALL G_ee(Kf,ee,Pold,G) ! Compute new electron-electron repulsion matrix G
-
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Electron-electron repulsion matrix G:"
-                CALL print_real_matrix(Kf,Kf,G)
-            END IF
-
-            F = H + G ! Compute new Fock operator
 
             IF (verbose) THEN
                 WRITE(*,*)
@@ -248,7 +263,7 @@ MODULE RHF
                     WRITE(*,*) "--------"
                 END IF
 
-                CALL RHF_step(Kf,Ne,Hc,X,ee,Pold,Pnew,F,E,verbose)
+                CALL RHF_step(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose)
 
                 IF (verbose) THEN
                     WRITE(*,*   )
@@ -281,6 +296,5 @@ MODULE RHF
             END IF
 
         END SUBROUTINE RHF_SCF
-
 
 END MODULE RHF

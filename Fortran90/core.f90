@@ -21,7 +21,7 @@ MODULE CORE
 
     USE KINETIC, only: T_kinetic
     USE NUCLEAR, only: V_nuclear
-    USE UTILS, only: print_real_matrix
+    USE OUTPUT, only: print_real_matrix
 
     IMPLICIT NONE
 

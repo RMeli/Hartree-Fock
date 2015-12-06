@@ -20,7 +20,7 @@
 PROGRAM nuclear_test
 
     USE NUCLEAR
-    USE UTILS, only: print_real_matrix
+    USE OUTPUT, only: print_real_matrix
 
     IMPLICIT NONE
 

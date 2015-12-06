@@ -20,7 +20,7 @@
 PROGRAM electronic_test
 
     USE ELECTRONIC
-    USE UTILS, only: print_ee_list
+    USE OUTPUT, only: print_ee_list
 
     IMPLICIT NONE
 

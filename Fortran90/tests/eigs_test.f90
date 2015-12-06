@@ -19,7 +19,8 @@
 
 PROGRAM eigs_test
 
-    USE UTILS, only: eigs, print_real_matrix
+    USE LA, only: EIGS
+    USE OUTPUT, only: print_real_matrix
 
     INTEGER, PARAMETER :: d = 2
 

@@ -27,7 +27,8 @@ MODULE UHF
     !
     ! --------------------------------------------------
 
-    USE UTILS, only: EIGS, print_real_matrix, print_ee_list
+    USE LA, only: EIGS
+    USE OUTPUT, only: print_real_matrix, print_ee_list
     USE DENSITY, only: P_density_spin, delta_P
     USE ELECTRONIC, only: G_ee_spin, EE_list
     USE ENERGY, only: E_tot_spin

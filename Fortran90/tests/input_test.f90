@@ -20,7 +20,7 @@
 PROGRAM input_test
 
     USE INPUT
-    USE UTILS
+    USE OUTPUT
 
     IMPLICIT NONE
 

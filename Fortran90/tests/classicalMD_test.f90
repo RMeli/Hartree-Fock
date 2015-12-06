@@ -21,7 +21,6 @@ PROGRAM classicalMD
 
     USE DYNAMICS, only: classical_step
     USE OUTPUT
-    USE UTILS
 
     IMPLICIT NONE
 

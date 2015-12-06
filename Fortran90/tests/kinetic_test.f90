@@ -20,7 +20,7 @@
 PROGRAM kinetic_test
 
     USE KINETIC
-    USE UTILS, only: print_real_matrix
+    USE OUTPUT, only: print_real_matrix
     USE CONSTANTS
 
     IMPLICIT NONE

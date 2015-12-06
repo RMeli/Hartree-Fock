@@ -20,7 +20,7 @@
 PROGRAM core_test
 
     USE CORE
-    USE UTILS, only: print_real_matrix
+    USE OUTPUT, only: print_real_matrix
 
     IMPLICIT NONE
 

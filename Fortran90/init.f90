@@ -24,10 +24,12 @@ MODULE INIT
 
     IMPLICIT NONE
 
+    CONTAINS
+
     ! ----------
     ! CORE GUESS
     ! ----------
-    SUBROUTINE core(Kf,Hc,F)
+    SUBROUTINE core_guess(Kf,Hc,F)
         ! ----------------------------
         ! Core Hamiltonian
         ! ----------------------------
@@ -52,14 +54,14 @@ MODULE INIT
         ! Initial guess: Core Hamiltonian
         F = Hc
 
-    END SUBROUTINE
+    END SUBROUTINE core_guess
 
 
 
     ! ------------
     ! HÜCKEL GUESS
     ! ------------
-    SUBROUTINE huckel(Kf,H,S,F,cst)
+    SUBROUTINE huckel_guess(Kf,Hc,S,F,cst)
         ! ----------------------------
         ! Extended Hückel Theory
         ! ----------------------------
@@ -90,7 +92,7 @@ MODULE INIT
             END DO
         END DO
 
-    END SUBROUTINE
+    END SUBROUTINE huckel_guess
 
 
 END MODULE INIT
