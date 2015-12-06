@@ -35,6 +35,7 @@ PROGRAM HF_N2
     REAL*8, allocatable, dimension(:,:) :: Rn           ! Atomic potisions
     INTEGER, allocatable, dimension(:) :: Zn            ! Atomic charges
     REAL*8, allocatable, dimension(:,:) :: basis_R      ! Basis functions' centers
+    INTEGER, allocatable, dimension(:) :: basis_idx     ! Basis set atomic index
     INTEGER, allocatable, dimension(:,:) :: basis_L     ! Basis functions' angular momenta
     REAL*8, allocatable, dimension(:,:) :: basis_A      ! Contraction exponential coefficients
     REAL*8, allocatable, dimension(:,:) :: basis_D      ! Conttaction linear coefficients
@@ -45,7 +46,7 @@ PROGRAM HF_N2
     ! LOAD SYSTEM AND BASIS SET INFORMATIONS FROM FILE
     ! ------------------------------------------------
 
-    CALL load("tests/H2_f.in",Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D)
+    CALL load("tests/N2_f.in",Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
     ! -----
     ! FORCE
@@ -54,7 +55,7 @@ PROGRAM HF_N2
     ALLOCATE(F(Nn,3))
 
     ! Force on atom 1
-    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,F,1D-4)
+    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,F,1D-4)
 
     WRITE(*,*) "######"
     WRITE(*,*) "FORCES"
