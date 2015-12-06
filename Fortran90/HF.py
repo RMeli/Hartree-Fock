@@ -79,7 +79,12 @@ class STO3G():
 
         self.STO3G = []
 
+        atom_idx = 0 # Atom index (start from 1)
+
         for a in atoms: # For every atom
+
+            atom_idx += 1
+
             for o in a.orbitals: # For every atomic orbital
                 if o == "1s":
                     a1 = 0.109818 * self.zeta1[a.name]**2
@@ -90,7 +95,8 @@ class STO3G():
                     d3 = 0.154329
 
                     self.STO3G.append({  "AOn":a.name,#
-                                    "AOt":o,#
+                                    "AOt":o,
+                                    "Aidx":atom_idx,#
                                     "R":a.R,#
                                     "lx":0,#
                                     "ly":0,#
@@ -108,6 +114,7 @@ class STO3G():
 
                     self.STO3G.append({  "AOn":a.name,
                                 "AOt":o,
+                                "Aidx":atom_idx,
                                 "R":a.R,
                                 "lx":0,
                                 "ly":0,
@@ -125,6 +132,7 @@ class STO3G():
 
                     self.STO3G.append({  "AOn":a.name,
                                     "AOt":o,
+                                    "Aidx":atom_idx,
                                     "R":a.R,
                                     "lx":1,
                                     "ly":0,
@@ -133,6 +141,7 @@ class STO3G():
                                     "d":(d1,d2,d3)})
                     self.STO3G.append({  "AOn":a.name,
                                     "AOt":o,
+                                    "Aidx":atom_idx,
                                     "R":a.R,
                                     "lx":0,
                                     "ly":1,
@@ -141,6 +150,7 @@ class STO3G():
                                     "d":(d1,d2,d3)})
                     self.STO3G.append({  "AOn":a.name,
                                     "AOt":o,
+                                    "Aidx":atom_idx,
                                     "R":a.R,
                                     "lx":0,
                                     "ly":0,
@@ -209,9 +219,8 @@ class IO:
         self.read() # Read from file
 
     def __del__(self):
-        pass
-        #self.ifile.close() # Close file input file
-        #self.ofile.close() # Close output file
+        self.ifile.close() # Close file input file
+        self.ofile.close() # Close output file
 
     def read(self):
         self.bsname = self.ifile.readline().strip() # Basis set name
@@ -279,8 +288,9 @@ class IO:
             for cd in b["d"]:
                 coeff_d += ' ' + "%+.10e" % float(cd)
 
-            line +=  coeff_a + coeff_d + os.linesep
+            line +=  coeff_a + coeff_d
 
+            line += ' ' + "%i" % b["Aidx"] + os.linesep
 
             self.ofile.write(line)
 
@@ -299,4 +309,4 @@ if __name__ == "__main__":
 
     os.system("./HF.x " + ffin) # Call Fortran Hartree-Fock program
 
-    os.system("rm " + ffin) # Remove input for Fortran program
+    #os.system("rm " + ffin) # Remove input for Fortran program

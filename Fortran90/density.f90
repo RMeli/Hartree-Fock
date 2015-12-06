@@ -72,6 +72,14 @@ MODULE DENSITY
             ! ----------------------------------------------------------
             ! Compute density matrix difference as convergence criterion
             ! ----------------------------------------------------------
+            !
+            ! Source:
+            !   A. Szabo and N. S. Ostlund
+            !   Modern Quantum Chemistry
+            !   Dover
+            !   1996
+            !
+            ! -----------------------------------------------------------
 
             IMPLICIT NONE
 
