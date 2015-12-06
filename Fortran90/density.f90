@@ -64,6 +64,46 @@ MODULE DENSITY
 
         END SUBROUTINE P_density
 
+        ! -------------------
+        ! SPIN DENSITY MATRIX
+        ! -------------------
+        SUBROUTINE P_density_spin(Kf,Ne,C,P)
+            ! ----------------------------------------------------------
+            ! Compute the density matrix from the optimized coefficients
+            ! ----------------------------------------------------------
+            !
+            ! Source:
+            !   Szabo and Ostlund
+            !   Modern Quantum Chemistry
+            !   Doever
+            !   1989
+            !
+            ! -----------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: Kf                           ! Number of basis functions
+            INTEGER, intent(in) :: Ne                           ! Number of electrons
+            REAL*8, dimension(Kf,Kf), intent(in) :: C           ! Coefficients matrix
+
+            ! INTERMEDIATE VARIABLES
+            INTEGER :: i, j, k                                  ! Loop coefficients
+
+            ! OUTPUT
+            REAL*8, dimension(Kf,Kf), intent(out) :: P          ! Density matrix
+
+            P(:,:) = 0.0D0
+
+            DO i = 1, Kf
+                DO j = 1, Kf
+                    DO k = 1, Ne
+                        P(i,j) = P(i,j) + C(i,k) * C(j,k)
+                    END DO
+                END DO
+            END DO
+
+        END SUBROUTINE P_density_spin
 
         ! -------------------------
         ! DENSITY MATRIX DIFFERENCE
