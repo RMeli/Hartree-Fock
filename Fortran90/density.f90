@@ -95,7 +95,7 @@ MODULE DENSITY
                 END DO
             END DO
 
-            delta = DSQRT(delta)
+            delta = DSQRT(delta / Kf**2)
 
         END FUNCTION delta_P
 
