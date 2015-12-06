@@ -18,6 +18,7 @@
 from basis import *
 
 import os
+import sys
 
 class Atom:
     """
@@ -223,11 +224,18 @@ class IO:
         self.ofile.close() # Close output file
 
     def read(self):
+        self.calculation = self.ifile.readline().strip() # Calculation
+        print(self.calculation)
+
         self.bsname = self.ifile.readline().strip() # Basis set name
 
         self.atoms = [] # List of atoms composing the system
 
-        self.Ne = self.ifile.readline().strip() # Number of electrons
+        self.Ne = int(self.ifile.readline().strip()) # Number of electrons
+
+        if (self.calculation == "RHF" and self.Ne % 2 != 0):
+            print("ERROR: Odd number of electrons for a RHF calculation.")
+            sys.exit(-1)
 
         self.Nn = 0 # Number of nuclei
 
@@ -247,6 +255,7 @@ class IO:
             print("ERROR: This basis set is not implemented.")
 
     def fortran_input(self):
+        self.ofile.write(self.calculation + os.linesep) # Calculation
         self.ofile.write(str(self.Ne) + os.linesep) # Number of electrons
         self.ofile.write(str(self.Nn) + os.linesep) # Number of nuclei
         self.ofile.write(str(self.bs.K) + os.linesep) # Number of basis set
@@ -298,8 +307,6 @@ class IO:
 
 
 if __name__ == "__main__":
-    import sys
-
     fin = sys.argv[1] # Python input file
 
     io = IO(fin) # Create input/output object

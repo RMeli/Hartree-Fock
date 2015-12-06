@@ -23,16 +23,17 @@ MODULE INPUT
 
     CONTAINS
 
-        SUBROUTINE load(fname,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
+        SUBROUTINE load(fname,calculation,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
             IMPLICIT NONE
 
-            ! INPUT
-            INTEGER, intent(out) :: Ne              ! Number of electrons
-            INTEGER, intent(out) :: Nn              ! Number of nuclei
-            INTEGER, intent(out) :: K               ! Basis set size
-            INTEGER, intent(out) :: c               ! Contractions (TODO: split valence basis set)
-            CHARACTER(len=*), intent(in) :: fname   ! Input file name
+            ! OUTPUT
+            CHARACTER (len=4), intent(out):: calculation    ! Calculation name
+            INTEGER, intent(out) :: Ne                      ! Number of electrons
+            INTEGER, intent(out) :: Nn                      ! Number of nuclei
+            INTEGER, intent(out) :: K                       ! Basis set size
+            INTEGER, intent(out) :: c                       ! Contractions (TODO: split valence basis set)
+            CHARACTER(len=*), intent(in) :: fname           ! Input file name
 
             ! INTERMEDIATE VARIABLES
             INTEGER :: i ! Loop index
@@ -49,6 +50,7 @@ MODULE INPUT
             ! Open file containing system and basis set informations
             OPEN(unit=100,file=fname,form="formatted",status="old",action="read")
 
+            READ(100,*) calculation
             READ(100,*) Ne
             READ(100,*) Nn
             READ(100,*) K
