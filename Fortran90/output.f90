@@ -109,9 +109,14 @@ MODULE OUTPUT
         ! APPEND TO XYZ
         ! -------------
         SUBROUTINE append_xyz(Nn,atoms,pos,unit)
-            ! -----------------------------------------------
+            ! ----------------------------------------------------
             ! Append nuclear positions to XYZ trajectory file
-            ! -----------------------------------------------
+            ! ----------------------------------------------------
+            !
+            ! Note:
+            !   Nuclear positions in the XYZ file are in Angstroms
+            !
+            ! ----------------------------------------------------
 
             IMPLICIT NONE
 
@@ -127,7 +132,7 @@ MODULE OUTPUT
             WRITE(unit,*) Nn
             WRITE(unit,*) ! TODO: add step number
             DO i = 1, Nn
-                WRITE(unit,*) atoms(i), pos(i,:)
+                WRITE(unit,*) atoms(i), pos(i,:) * 0.529177249
             END DO
 
         END SUBROUTINE
