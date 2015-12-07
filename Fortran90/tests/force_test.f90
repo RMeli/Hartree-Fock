@@ -40,13 +40,15 @@ PROGRAM HF_N2
     REAL*8, allocatable, dimension(:,:) :: basis_A      ! Contraction exponential coefficients
     REAL*8, allocatable, dimension(:,:) :: basis_D      ! Conttaction linear coefficients
 
-    REAL*8, allocatable, dimension(:,:) :: F
+    REAL*8, allocatable, dimension(:,:) :: F            ! Forces
+
+    CHARACTER (len=4) :: calculation                    ! Type of calculation
 
     ! ------------------------------------------------
     ! LOAD SYSTEM AND BASIS SET INFORMATIONS FROM FILE
     ! ------------------------------------------------
 
-    CALL load("tests/N2_f.in",Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
+    CALL load("tests/H2O_f.in",calculation,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
     ! -----
     ! FORCE

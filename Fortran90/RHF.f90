@@ -44,7 +44,7 @@ MODULE RHF
         ! --------
         ! SCF STEP
         ! --------
-        SUBROUTINE RHF_step(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose)
+        SUBROUTINE RHF_step(Kf,Ne,H,X,ee,Pold,Pnew,F,orbitalE,step,verbose)
             ! ----------------------------------------------------------------------
             ! Perform a single step of the SCF procedure to solve Roothan equations.
             ! ----------------------------------------------------------------------
@@ -63,7 +63,6 @@ MODULE RHF
             INTEGER, intent(in) :: Kf                           ! Number of basis functions
             INTEGER, intent(in) :: Ne                           ! Number of electrons
             REAL*8, dimension(Kf,Kf), intent(in) :: H           ! Core Hamiltonian
-            REAL*8, dimension(Kf,Kf), intent(in) :: S           ! Overlap matrix
             REAL*8, dimension(Kf,Kf), intent(in) :: X           ! Transformation maxrix
             REAL*8, dimension(Kf,Kf), intent(in) :: Pold        ! Old density matrix
             REAL*8, dimension(Kf,Kf,Kf,Kf), intent(in) :: ee    ! Electron-electron list
@@ -77,16 +76,13 @@ MODULE RHF
             REAL*8, dimension(Kf,Kf) :: C                       ! Coefficient matrix in the original basis set
 
             ! INPUT / OUTPUT
+            REAL*8, dimension(Kf,Kf), intent(inout) :: F        ! Fock operator (input for the first guess)
+
+            ! OUTPUT
             REAL*8, dimension(Kf,Kf), intent(out) :: Pnew       ! New density matrix
-            REAL*8, dimension(Kf,Kf), intent(out) :: F          ! Fock operator
             REAL*8, dimension(Kf), intent(out) :: orbitalE      ! Orbital energies
 
-            IF (step .EQ. 1) THEN
-
-                ! Initial guess for Fock matrix
-                CALL huckel_guess(Kf,H,S,F,1.450D0)
-
-            ELSE
+            IF (step .NE. 1) THEN ! If step=1, F already contains the initial guess
 
                 ! Compute Fock matrix using previous density matrix
 
@@ -181,18 +177,18 @@ MODULE RHF
             ! Matrices
             ! --------
 
-            REAL*8, dimension(Kf,Kf) :: S     ! Overlap matrix
-            REAL*8, dimension(Kf,Kf) :: X     ! Transformation matrix
+            REAL*8, dimension(Kf,Kf) :: S           ! Overlap matrix
+            REAL*8, dimension(Kf,Kf) :: X           ! Transformation matrix
 
-            REAL*8, dimension(Kf,Kf) :: Hc    ! Core Hamiltonian
+            REAL*8, dimension(Kf,Kf) :: Hc          ! Core Hamiltonian
 
-            REAL*8, dimension(Kf,Kf) :: Pold  ! Old density matrix
-            REAL*8, dimension(Kf,Kf) :: Pnew  ! New density matrix
+            REAL*8, dimension(Kf,Kf) :: Pold        ! Old density matrix
+            REAL*8, dimension(Kf,Kf) :: Pnew        ! New density matrix
 
-            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee ! List of electron-electron integrals
+            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee    ! List of electron-electron integrals
 
-            REAL*8, dimension(Kf,Kf) :: F     ! Fock matrix
-            REAL*8, dimension(Kf) :: E           ! Orbital energies
+            REAL*8, dimension(Kf,Kf) :: F           ! Fock matrix
+            REAL*8, dimension(Kf) :: E              ! Orbital energies
 
             ! --------------
             ! SCF parameters
@@ -247,6 +243,12 @@ MODULE RHF
             Pold(:,:) = 0.0D0
             Pnew(:,:) = 0.0D0
 
+            ! -------------
+            ! Initial guess
+            ! -------------
+
+            CALL huckel_guess(Kf,Hc,S,F,1.450D0)
+
             ! ---------
             ! SCF cycle
             ! ---------
@@ -263,7 +265,7 @@ MODULE RHF
                     WRITE(*,*) "--------"
                 END IF
 
-                CALL RHF_step(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose)
+                CALL RHF_step(Kf,Ne,Hc,X,ee,Pold,Pnew,F,E,step,verbose)
 
                 IF (verbose) THEN
                     WRITE(*,*   )

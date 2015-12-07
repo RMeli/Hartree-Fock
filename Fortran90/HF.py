@@ -316,4 +316,4 @@ if __name__ == "__main__":
 
     os.system("./HF.x " + ffin) # Call Fortran Hartree-Fock program
 
-    os.system("rm " + ffin) # Remove input for Fortran program
+    #os.system("rm " + ffin) # Remove input for Fortran program

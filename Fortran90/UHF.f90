@@ -35,6 +35,7 @@ MODULE UHF
     USE OVERLAP, only: S_overlap, X_transform
     USE CORE, only: H_core
     USE CONSTANTS
+    USE INIT
 
     IMPLICIT NONE
 
@@ -43,7 +44,7 @@ MODULE UHF
         ! --------
         ! SCF STEP
         ! --------
-        SUBROUTINE UHF_step(Kf,Ne,H,X,ee,Paold,Panew,Pbold,Pbnew,Fa,Fb,orbitalEa,orbitalEb,verbose)
+        SUBROUTINE UHF_step(Kf,Ne,H,X,ee,Paold,Panew,Pbold,Pbnew,Fa,Fb,orbitalEa,orbitalEb,step,verbose)
             ! ---------------------------------------------------------------------------
             ! Perform a single step of the SCF procedure to solve Pople-Nesbet equations.
             ! ---------------------------------------------------------------------------
@@ -66,6 +67,7 @@ MODULE UHF
             REAL*8, dimension(Kf,Kf), intent(in) :: Paold       ! Old density matrix for alpha spin
             REAL*8, dimension(Kf,Kf), intent(in) :: Pbold       ! Old density matrix for beta spin
             REAL*8, dimension(Kf,Kf,Kf,Kf), intent(in) :: ee    ! Electron-electron list
+            INTEGER, intent(in) :: step                         ! Current step
             LOGICAL, intent(in) :: verbose                      ! Flag to print matrices
 
             ! INTERMEDIATE VARIABLES
@@ -81,10 +83,12 @@ MODULE UHF
             INTEGER :: Neb                                       ! Beta spin electrons
 
             ! INPUT / OUTPUT
+            REAL*8, dimension(Kf,Kf), intent(inout) :: Fa        ! Fock operator for alpha spin
+            REAL*8, dimension(Kf,Kf), intent(inout) :: Fb        ! Fock operator for beta spin
+
+            ! OUTPUT
             REAL*8, dimension(Kf,Kf), intent(out) :: Panew       ! New density matrix for alpha spin
             REAL*8, dimension(Kf,Kf), intent(out) :: Pbnew       ! New density matrix for beta spin
-            REAL*8, dimension(Kf,Kf), intent(out) :: Fa          ! Fock operator for alpha spin
-            REAL*8, dimension(Kf,Kf), intent(out) :: Fb          ! Fock operator for beta spin
             REAL*8, dimension(Kf), intent(out) :: orbitalEa      ! Orbital energies for alpha spin
             REAL*8, dimension(Kf), intent(out) :: orbitalEb      ! Orbital energies for beta spin
 
@@ -98,35 +102,39 @@ MODULE UHF
                 Neb = Ne - Nea
             END IF
 
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Density matrix P (alpha spin):"
-                CALL print_real_matrix(Kf,Kf,Paold)
+            IF (step .NE. 1) THEN
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Density matrix P (alpha spin):"
+                    CALL print_real_matrix(Kf,Kf,Paold)
+                END IF
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Density matrix P (beta spin):"
+                    CALL print_real_matrix(Kf,Kf,Pbold)
+                END IF
+
+                CALL G_ee_spin(Kf,ee,Paold+Pbold,Paold,Ga) ! Compute new electron-electron repulsion matrix Ga for alpha spin
+                CALL G_ee_spin(Kf,ee,Paold+Pbold,Pbold,Gb) ! Compute new electron-electron repulsion matrix Gb for beta spin
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Electron-electron repulsion matrix G (alpha spin):"
+                    CALL print_real_matrix(Kf,Kf,Ga)
+                END IF
+
+                IF (verbose) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "Electron-electron repulsion matrix G (beta spin):"
+                    CALL print_real_matrix(Kf,Kf,Gb)
+                END IF
+
+                Fa = H + Ga ! Compute new Fock operator (alpha spin)
+                Fb = H + Gb ! Compute new Fock operator (alpha spin)
+
             END IF
-
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Density matrix P (beta spin):"
-                CALL print_real_matrix(Kf,Kf,Pbold)
-            END IF
-
-            CALL G_ee_spin(Kf,ee,Paold+Pbold,Paold,Ga) ! Compute new electron-electron repulsion matrix Ga for alpha spin
-            CALL G_ee_spin(Kf,ee,Paold+Pbold,Pbold,Gb) ! Compute new electron-electron repulsion matrix Gb for beta spin
-
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Electron-electron repulsion matrix G (alpha spin):"
-                CALL print_real_matrix(Kf,Kf,Ga)
-            END IF
-
-            IF (verbose) THEN
-                WRITE(*,*)
-                WRITE(*,*) "Electron-electron repulsion matrix G (beta spin):"
-                CALL print_real_matrix(Kf,Kf,Gb)
-            END IF
-
-            Fa = H + Ga ! Compute new Fock operator (alpha spin)
-            Fb = H + Gb ! Compute new Fock operator (alpha spin)
 
             IF (verbose) THEN
                 WRITE(*,*)
@@ -158,6 +166,7 @@ MODULE UHF
             ! ------------------------------------------
             ! Solve orthogonalized Pople-Nesbet equtions
             ! ------------------------------------------
+
             CALL EIGS(Kf,Fax,Cax,orbitalEa) ! Compute coefficients (in orthonormal basis) and orbital energies (alpha spin)
             CALL EIGS(Kf,Fbx,Cbx,orbitalEb) ! Compute coefficients (in orthonormal basis) and orbital energies (beta spin)
 
@@ -304,11 +313,17 @@ MODULE UHF
                 CALL print_ee_list(Kf,ee)
             END IF
 
-            ! TODO Implement other guess for the initial state
             Paold(:,:) = 0.0D0
             Panew(:,:) = 0.0D0
-            Pbold(:,:) = 0.1D0
-            Pbnew(:,:) = 0.11D0
+            Pbold(:,:) = 0.0D0
+            Pbnew(:,:) = 0.0D0
+
+            ! -------------
+            ! Initial guess
+            ! -------------
+
+            CALL huckel_guess(Kf,Hc,S,Fa,1.5D0)
+            CALL huckel_guess(Kf,Hc,S,Fb,1.4D0)
 
             ! ---------
             ! SCF cycle
@@ -326,7 +341,7 @@ MODULE UHF
                     WRITE(*,*) "--------"
                 END IF
 
-                CALL UHF_step(Kf,Ne,Hc,X,ee,Paold,Panew,Pbold,Pbnew,Fa,Fb,Ea,Eb,verbose)
+                CALL UHF_step(Kf,Ne,Hc,X,ee,Paold,Panew,Pbold,Pbnew,Fa,Fb,Ea,Eb,step,verbose)
 
                 IF (verbose) THEN
                     WRITE(*,*   )
