@@ -195,7 +195,7 @@ MODULE RHF
             ! --------------
 
             LOGICAL :: converged                    ! Convergence parameter
-            INTEGER, PARAMETER :: maxiter = 250     ! Maximal number of iterations (TODO: user defined maxiter)
+            INTEGER, PARAMETER :: maxiter = 500     ! Maximal number of iterations (TODO: user defined maxiter)
             INTEGER :: step                         ! SCF steps counter
 
             !!!
@@ -272,7 +272,7 @@ MODULE RHF
                     WRITE(*,*) "Total energy:", E_tot(Kf,Nn,Rn,Zn,Pold,F,Hc)
                 END IF
 
-                IF ( delta_P(Kf,Pold,Pnew) < 1.0e-12) THEN
+                IF ( delta_P(Kf,Pold,Pnew) < 1.0e-6) THEN
                     converged = .TRUE.
 
                     final_E = E_tot(Kf,Nn,Rn,Zn,Pold,F,Hc)

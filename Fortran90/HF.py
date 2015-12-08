@@ -224,16 +224,29 @@ class IO:
         self.ofile.close() # Close output file
 
     def read(self):
-        self.calculation = self.ifile.readline().strip() # Calculation
-        print(self.calculation)
 
-        self.bsname = self.ifile.readline().strip() # Basis set name
+        self.calculation = self.ifile.readline().strip() # Calculation (SP, FORCE, BOMD)
+
+        if self.calculation not in ["SP","FORCE"]:
+            print("ERROR: This calculation is not implemented.")
+            sys.exit(-1)
+
+        line = self.ifile.readline().strip()
+
+        self.method = line.split('/')[0] # Method (RHF/UHF)
+
+        # Check validity of method
+        if self.method not in ["RHF","UHF"]:
+            print("ERROR: This method is not implemented.")
+            sys.exit(-1)
+
+        self.bsname = line.split('/')[-1] # Basis set name
 
         self.atoms = [] # List of atoms composing the system
 
         self.Ne = int(self.ifile.readline().strip()) # Number of electrons
 
-        if (self.calculation == "RHF" and self.Ne % 2 != 0):
+        if (self.method == "RHF" and self.Ne % 2 != 0):
             print("ERROR: Odd number of electrons for a RHF calculation.")
             sys.exit(-1)
 
@@ -248,14 +261,17 @@ class IO:
 
             self.Nn += 1
 
+
         if self.bsname == "STO-3G":
             self.bs = STO3G(self.atoms)
             self.contractions = 3
         else:
             print("ERROR: This basis set is not implemented.")
+            sys.exit(-1)
 
     def fortran_input(self):
         self.ofile.write(self.calculation + os.linesep) # Calculation
+        self.ofile.write(self.method + os.linesep) # Method
         self.ofile.write(str(self.Ne) + os.linesep) # Number of electrons
         self.ofile.write(str(self.Nn) + os.linesep) # Number of nuclei
         self.ofile.write(str(self.bs.K) + os.linesep) # Number of basis set
@@ -316,4 +332,4 @@ if __name__ == "__main__":
 
     os.system("./HF.x " + ffin) # Call Fortran Hartree-Fock program
 
-    #os.system("rm " + ffin) # Remove input for Fortran program
+    os.system("rm " + ffin) # Remove input for Fortran program

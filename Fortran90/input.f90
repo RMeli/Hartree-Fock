@@ -23,12 +23,13 @@ MODULE INPUT
 
     CONTAINS
 
-        SUBROUTINE load(fname,calculation,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
+        SUBROUTINE load(fname,calculation,method,Ne,Nn,K,c,Rn,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
             IMPLICIT NONE
 
             ! OUTPUT
-            CHARACTER (len=4), intent(out):: calculation    ! Calculation name
+            CHARACTER (len=5), intent(out):: calculation    ! Calculation name
+            CHARACTER (len=3), intent(out):: method         ! Method
             INTEGER, intent(out) :: Ne                      ! Number of electrons
             INTEGER, intent(out) :: Nn                      ! Number of nuclei
             INTEGER, intent(out) :: K                       ! Basis set size
@@ -51,6 +52,7 @@ MODULE INPUT
             OPEN(unit=100,file=fname,form="formatted",status="old",action="read")
 
             READ(100,*) calculation
+            READ(100,*) method
             READ(100,*) Ne
             READ(100,*) Nn
             READ(100,*) K
