@@ -27,6 +27,7 @@ MODULE FORCES
     !--------------------------------------------
 
     USE RHF
+    USE UHF
 
     IMPLICIT NONE
 
@@ -64,7 +65,7 @@ MODULE FORCES
 
         END SUBROUTINE
 
-        SUBROUTINE force_idx_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,idx,force,delta)
+        SUBROUTINE force_idx_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,idx,force,delta,method)
             ! ------------------------------------------------------------------------
             ! Compute forces on atom IDX by finite difference (computationally costly)
             ! ------------------------------------------------------------------------
@@ -79,11 +80,12 @@ MODULE FORCES
             INTEGER, dimension(Kf,3), intent(in) :: basis_L             ! Angular momenta of basis set Gaussians
             REAL*8, dimension(Kf,3), intent(in) :: basis_R              ! Centers of basis set Gaussians
             REAL*8, dimension(Kf,c), intent(in) :: basis_D, basis_A     ! Basis set coefficients
-            INTEGER, dimension(Kf), intent(in):: basis_idx            ! Basis set atom index
+            INTEGER, dimension(Kf), intent(in):: basis_idx              ! Basis set atom index
             REAL*8, dimension(Nn,3), intent(in) :: Rn                   ! Nuclear positions
             INTEGER, dimension(Nn), intent(in) :: Zn                    ! Nuclear charges
             INTEGER, intent(in) :: idx                                  ! Atom index (compute forces for atom idx)
-            REAL*8, intent(in) :: delta
+            REAL*8, intent(in) :: delta                                 ! Step size
+            CHARACTER (len=3), intent(in) :: method                     ! Method (RHF or UHF)
 
             ! OUTPUT
             REAL*8, dimension(Nn,3), intent(out) :: force               ! Vector of forces (on every atom)
@@ -123,7 +125,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
 
             ! Displace atom and basis set at new atomic position
 
@@ -134,7 +142,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
 
             ! Compute force along x
 
@@ -156,7 +170,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
 
             ! Displace atom and basis set at new atomic position
 
@@ -167,7 +187,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
 
             ! Compute force along y
 
@@ -189,7 +215,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+            END IF
 
             ! Displace atom and basis set at new atomic position
 
@@ -200,7 +232,13 @@ MODULE FORCES
 
             ! Total energy calculation at new atomic position
 
-            CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            IF (method .EQ. "RHF") THEN
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
+
+            IF (method .EQ. "UHF") THEN
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+            END IF
 
             ! Compute force along z
 
@@ -208,10 +246,12 @@ MODULE FORCES
 
         END SUBROUTINE
 
-        SUBROUTINE force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,force,delta)
+        SUBROUTINE force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,force,delta,method)
             ! -------------------------------------------------------------------------
             ! Compute forces on all atoms by finite difference (computationally costly)
             ! -------------------------------------------------------------------------
+
+            IMPLICIT NONE
 
             ! INPUT
             INTEGER, intent(in) :: Kf                                   ! Basis set size
@@ -221,10 +261,11 @@ MODULE FORCES
             INTEGER, dimension(Kf,3), intent(in) :: basis_L             ! Angular momenta of basis set Gaussians
             REAL*8, dimension(Kf,3), intent(in) :: basis_R              ! Centers of basis set Gaussians
             REAL*8, dimension(Kf,c), intent(in) :: basis_D, basis_A     ! Basis set coefficients
-            INTEGER, dimension(Kf), intent(in):: basis_idx            ! Basis set atom index
+            INTEGER, dimension(Kf), intent(in):: basis_idx              ! Basis set atom index
             REAL*8, dimension(Nn,3), intent(in) :: Rn                   ! Nuclear positions
             INTEGER, dimension(Nn), intent(in) :: Zn                    ! Nuclear charges
-            REAL*8, intent(in) :: delta
+            REAL*8, intent(in) :: delta                                 ! Step size
+            CHARACTER (len=3), intent(in) :: method                     ! Method (RHF or UHF)
 
             ! OUTPUT
             REAL*8, dimension(Nn,3), intent(out) :: force               ! Vector of forces (on every atom)
@@ -234,7 +275,7 @@ MODULE FORCES
 
             ! Loop on every atom of the system
             DO i = 1, Nn
-                CALL force_idx_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,i,force,delta)
+                CALL force_idx_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,i,force,delta,method)
             END DO
 
         END SUBROUTINE force_fd
