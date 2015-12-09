@@ -137,7 +137,7 @@ MODULE DYNAMICS
     ! -----------------------------------
     ! BORN-OPPENHEIMER MOLECULAR DYNAMICS
     ! -----------------------------------
-    SUBROUTINE BO_step(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,mass,pos,vel,force_t,dt)
+    SUBROUTINE BO_step(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,mass,pos,vel,force_t,dt,method)
         ! ----------------------------------------------------------------------------------------------------------
         ! Perform a step of Born-Oppenheimer Molecular Dynamics using Hartree-Fock solution of Schrödinger equation.
         ! ----------------------------------------------------------------------------------------------------------
@@ -155,6 +155,7 @@ MODULE DYNAMICS
         INTEGER, dimension(Kf), intent(in) :: basis_idx             ! Basis set atom index (link between basis set function and atoms)
         REAL*8, dimension(Nn) :: mass                               ! Nuclear masses
         REAL*8, intent(in) :: dt                                    ! Integration time step
+        CHARACTER (len=3), intent(in) :: method                     ! Total energy calculation method (RHF, UHF)
 
         ! INPUT/OUTPUT
         REAL*8, dimension(Nn,3), intent(inout) :: pos               ! Nuclear positions
@@ -189,7 +190,7 @@ MODULE DYNAMICS
         ! Compute forces at new nuclear positions
         ! ---------------------------------------
 
-        CALL force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,pos,force_tdt,delta)
+        CALL force_fd(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,pos,force_tdt,delta,method)
 
         ! -------------------------
         ! Update nuclear velocities
