@@ -247,7 +247,8 @@ MODULE RHF
             ! Initial guess
             ! -------------
 
-            CALL huckel_guess(Kf,Hc,S,F,1.450D0)
+            !CALL core_guess(Kf,Hc,F)
+            CALL huckel_guess(Kf,Hc,S,F,1.750D0)
 
             ! ---------
             ! SCF cycle

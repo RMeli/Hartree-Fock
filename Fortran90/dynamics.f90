@@ -22,7 +22,7 @@ MODULE DYNAMICS
     ! DYNAMICS
     ! ----------------------------------------------------------
     !
-    ! Performs classical and Born-oppenheimer molecular dynamics
+    ! Performs classical and Born-Oppenheimer molecular dynamics
     ! using the velocity Verlet integration algorithm.
     !
     !-----------------------------------------------------------

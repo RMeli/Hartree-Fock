@@ -322,8 +322,8 @@ MODULE UHF
             ! Initial guess
             ! -------------
 
-            CALL huckel_guess(Kf,Hc,S,Fa,1.5D0)
-            CALL huckel_guess(Kf,Hc,S,Fb,1.4D0)
+            CALL huckel_guess(Kf,Hc,S,Fa,1.75D0)
+            CALL huckel_guess(Kf,Hc,S,Fb,1.75D0)
 
             ! ---------
             ! SCF cycle

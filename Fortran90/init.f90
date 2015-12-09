@@ -62,13 +62,18 @@ MODULE INIT
     ! HÜCKEL GUESS
     ! ------------
     SUBROUTINE huckel_guess(Kf,Hc,S,F,cst)
-        ! ----------------------------
+        ! -----------------------------------------------------
         ! Extended Hückel Theory
-        ! ----------------------------
+        ! -----------------------------------------------------
         !
         ! Source:
+        !   Extended Hückel and Slater’s rule initial guess for
+        !       real space grid-based density functional theory
+        !   M. Lee, K. Leiter, C. Eisner, J. Crone and J. Knap
+        !   Computational and Theoretical Chemistry
+        !   2015
         !
-        !-----------------------------
+        !------------------------------------------------------
 
         IMPLICIT NONE
 

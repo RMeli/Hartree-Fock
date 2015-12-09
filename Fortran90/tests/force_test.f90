@@ -17,7 +17,7 @@
 !
 ! ---------------------------------------------------------------------
 
-PROGRAM HF_N2
+PROGRAM force_test
 
     USE INPUT
     USE RHF
@@ -56,7 +56,7 @@ PROGRAM HF_N2
 
     ALLOCATE(F(Nn,3))
 
-    ! Force on atom 1
+    ! Compute force on all atoms
     CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,Rn,F,1D-4)
 
     WRITE(*,*) "######"
@@ -70,4 +70,4 @@ PROGRAM HF_N2
 
     DEALLOCATE(Rn,Zn,basis_R,basis_L,basis_A,basis_D,F) ! Deallocate allocated memory
 
-END PROGRAM HF_N2
+END PROGRAM force_test

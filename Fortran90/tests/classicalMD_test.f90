@@ -36,7 +36,7 @@ PROGRAM classicalMD
     REAL*8, dimension(Nn,3) :: force
     REAL*8, dimension(Nn) :: mass
 
-    atoms = (/"H","H","H"/)
+    atoms = (/"H","H"/)
 
     pos(1,:) = (/0.0D0, 0.0D0, 0.0D0/)
     pos(2,:) = (/1.2*1.0D0, 0.0D0, 0.0D0/)
