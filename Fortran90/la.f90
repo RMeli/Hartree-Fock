@@ -61,9 +61,42 @@ MODULE LA
 
         IF (INFO .NE. 0) THEN
             WRITE(*,*) "ERROR: IMPOSSIBLE TO SOLVE THE EIGENVALUE PROBLEM!"
+            CALL EXIT(-1)
         END IF
 
     END SUBROUTINE EIGS
 
+    ! -------------------
+    ! SOLVE LINEAR SYSTEM
+    ! -------------------
+    SUBROUTINE LINEAR_SYSTEM(d,A,b,x)
+        ! -----------------------------
+        ! Solve the linear system AX=B.
+        ! -----------------------------
+
+        IMPLICIT NONE
+
+        ! INPUT
+        INTEGER, intent(in) :: d                        ! Dimension of A and B
+        REAL*8, dimension(d,d), intent(in) :: A         ! Matrix A
+        REAL*8, dimension(d), intent(in) :: b           ! Vector b
+
+        ! INTERMEDIATE VARIABLES
+        INTEGER :: INFO                                 ! Information flag for DGESV
+        INTEGER, dimension(d) :: IPIV                   ! Pivots
+
+        ! OUTPUT
+        REAL*8, dimension(d), intent(out) :: x           ! Solution
+
+        x = b ! The solution contains the RHS in entry
+
+        CALL DGESV(d,1,A,d,IPIV,x,d,INFO)
+
+        IF (INFO .NE. 0) THEN
+            WRITE(*,*) "ERROR: IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM!"
+            CALL EXIT(-1)
+        END IF
+
+    END SUBROUTINE LINEAR_SYSTEM
 
 END MODULE LA
