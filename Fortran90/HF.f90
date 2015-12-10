@@ -96,7 +96,7 @@ PROGRAM HF
             WRITE(*,*)
             WRITE(*,*)
 
-            CALL RHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
+            CALL RHF_DIIS(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
 
         ! -------------------------
         ! UNRESTRICTED HARTREE-FOCK

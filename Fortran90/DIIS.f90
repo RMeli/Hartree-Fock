@@ -28,6 +28,7 @@ MODULE DIIS
     ! ------------------------------------------------------
 
     USE LA, only: LINEAR_SYSTEM
+    USE OUTPUT
 
     IMPLICIT NONE
 
@@ -135,25 +136,25 @@ MODULE DIIS
         END DO
 
         DO j = 1, steps
-            B(j,steps+1) = -1.0D0
+            B(steps+1,j) = -1.0D0
         END DO
 
         B(steps+1,steps+1) = 0.0D0
 
     END SUBROUTINE DIIS_B
 
-    SUBROUTINE DIIS_weigts(step,B,w)
+    SUBROUTINE DIIS_weigts(step,B,w,info)
         ! ---------------------------------------
         ! Compute DIIS weights.
         ! ---------------------------------------
         !
         ! Source:
-        !   P. Pulay
-        !   Improved SCF Convergence Acceleration
-        !   Journal of Computatuonal Chemistry
-        !   1982
+        !   T. Helgaker, P. Jørgensen and J. Olsen
+        !   Molecular Electronic-Structure Theory
+        !   Wiley
+        !   2000
         !
-        ! ---------------------------------------
+        ! ----------------------------------------
 
         IMPLICIT NONE
 
@@ -167,12 +168,15 @@ MODULE DIIS
 
         ! OUTPUT
         REAL*8, dimension(step), intent(out) :: w           ! Weights (SOL without the Lagrange multiplier)
+        INTEGER, intent(out) :: info                        ! Information about the solution of the linear system
 
         rhs(:) = 0.0D0
 
         rhs(step+1) = -1.0D0
 
-        CALL LINEAR_SYSTEM(step+1,B,rhs,sol) ! Solve linear system B*SOL=RHS
+        !CALL print_real_matrix(step+1,step+1,B)
+
+        CALL LINEAR_SYSTEM(step+1,B,rhs,sol,info) ! Solve linear system B*SOL=RHS
 
         w = sol(1:step) ! Discard Lagrange multiplier
 
@@ -203,6 +207,7 @@ MODULE DIIS
         REAL*8, dimension(step+1,step+1) :: B                           ! Matrix B
         REAL*8, dimension(step) :: w                                    ! Weights
         INTEGER :: i                                                    ! Loop index
+        INTEGER :: info                                                 ! Information about the solution of the linear system
 
         ! Compute error at current iteration
         CALL DIIS_error(Kf,F,P,S,X,error,maxerror)
@@ -215,13 +220,25 @@ MODULE DIIS
         CALL DIIS_B(elist,step,B)
 
         ! Compute weights
-        CALL DIIS_weigts(step,B,w)
+        CALL DIIS_weigts(step,B,w,info)
 
-        F(:,:) = 0.0D0 ! Erase current Fock matrix F (already stored in FLIST)
+        IF (info .EQ. 0) THEN ! Solution of the linear system is possible
 
-        DO i = 1, step
-            F = F + w(i) * Flist(i,:,:)
-        END DO
+            F(:,:) = 0.0D0 ! Erase current Fock matrix F (already stored in FLIST)
+
+            ! Create a new Fock matrix according to the DIIS algorithm
+            DO i = 1, step
+                F = F + w(i) * Flist(i,:,:)
+            END DO
+
+        ELSE
+            WRITE(*,*) "IMPOSSIBLE SOLUTION OF THE LINEAR SYSTEM"
+        END IF
+
+        WRITE(*,*) "##########"
+        WRITE(*,*) "MAX ERROR:", maxerror
+        WRITE(*,*) "##########"
+
 
     END SUBROUTINE
 

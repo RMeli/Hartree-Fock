@@ -69,7 +69,7 @@ MODULE LA
     ! -------------------
     ! SOLVE LINEAR SYSTEM
     ! -------------------
-    SUBROUTINE LINEAR_SYSTEM(d,A,b,x)
+    SUBROUTINE LINEAR_SYSTEM(d,A,b,x,INFO)
         ! -----------------------------
         ! Solve the linear system AX=B.
         ! -----------------------------
@@ -82,20 +82,20 @@ MODULE LA
         REAL*8, dimension(d), intent(in) :: b           ! Vector b
 
         ! INTERMEDIATE VARIABLES
-        INTEGER :: INFO                                 ! Information flag for DGESV
         INTEGER, dimension(d) :: IPIV                   ! Pivots
 
         ! OUTPUT
-        REAL*8, dimension(d), intent(out) :: x           ! Solution
+        REAL*8, dimension(d), intent(out) :: x          ! Solution
+        INTEGER, intent(out) :: INFO                    ! Information flag for DGESV
 
         x = b ! The solution contains the RHS in entry
 
         CALL DGESV(d,1,A,d,IPIV,x,d,INFO)
 
-        IF (INFO .NE. 0) THEN
-            WRITE(*,*) "ERROR: IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM!"
-            CALL EXIT(-1)
-        END IF
+        !IF (INFO .NE. 0) THEN
+        !    WRITE(*,*) "ERROR: IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM!"
+        !    CALL EXIT(-1)
+        !END IF
 
     END SUBROUTINE LINEAR_SYSTEM
 
