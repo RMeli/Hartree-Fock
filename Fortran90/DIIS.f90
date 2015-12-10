@@ -50,7 +50,7 @@ MODULE DIIS
 
         DO i = 1, n
             DO j = 1, n
-                Mr(i+n*j) = M(i,j)
+                Mr(j+n*(i-1)) = M(i,j)
             END DO
         END DO
 
