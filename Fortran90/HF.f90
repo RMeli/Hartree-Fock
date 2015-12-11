@@ -23,6 +23,7 @@ PROGRAM HF
     USE RHF
     USE UHF
     USE FORCES
+    USE MULTIPOLE
 
     IMPLICIT NONE
 
@@ -48,6 +49,9 @@ PROGRAM HF
     REAL*8, allocatable, dimension(:,:) :: basis_D      ! Contaction linear coefficients
     INTEGER, allocatable, dimension(:) :: basis_idx     ! Basis set atomic index
 
+    REAL*8, allocatable, dimension(:,:) :: P            ! Final density matrix
+
+    REAL*8, dimension(3) :: mu                          ! Dipole
     REAL*8, allocatable, dimension(:,:) :: force        ! Forces acting on nuclei
 
     REAL*8 :: final_E ! Total converged energy
@@ -79,6 +83,8 @@ PROGRAM HF
 
     IF (calculation .EQ. "SP") THEN
 
+        ALLOCATE(P(K,K))
+
         ! -----------------------
         ! RESTRICTED HARTREE-FOCK
         ! -----------------------
@@ -96,7 +102,14 @@ PROGRAM HF
             WRITE(*,*)
             WRITE(*,*)
 
-            CALL RHF_DIIS(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
+
+
+            CALL RHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,P,.TRUE.)
+
+            CALL dipole(K,c,Nn,basis_D,basis_A,basis_L,basis_R,P,Rn,Zn,mu)
+
+            WRITE(*,*)
+            WRITE(*,*) "Dipole:", mu
 
         ! -------------------------
         ! UNRESTRICTED HARTREE-FOCK
@@ -110,12 +123,19 @@ PROGRAM HF
             WRITE(*,*)
             WRITE(*,*)
 
-            CALL UHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,.TRUE.)
+            CALL UHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,P,.TRUE.)
+
+            CALL dipole(K,c,Nn,basis_D,basis_A,basis_L,basis_R,P,Rn,Zn,mu)
+
+            WRITE(*,*)
+            WRITE(*,*) "Dipole:", mu
 
         ELSE
             WRITE(*,*) "ERROR: Invalid method for single point (SP) calculation."
             CALL EXIT(-1)
         END IF
+
+        DEALLOCATE(P)
 
     ! -----------------
     ! FORCE CALCULATION

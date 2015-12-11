@@ -7,7 +7,7 @@ LIBS = -L/opt/local/lib/ -lslatec -llapack -lblas -latlas
 ########
 
 HF:
-	$(COMP) $(FLAGS) $(LIBS) input.f90 output.f90 constants.f90 factorial.f90 gaussian.f90 overlap.f90 kinetic.f90 nuclear.f90 core.f90 electronic.f90 la.f90 density.f90 energy.f90 init.f90 DIIS.f90 RHF.f90 UHF.f90 force.f90  HF.f90 -o HF.x
+	$(COMP) $(FLAGS) $(LIBS) input.f90 output.f90 constants.f90 factorial.f90 gaussian.f90 multipole.f90 overlap.f90 kinetic.f90 nuclear.f90 core.f90 electronic.f90 la.f90 density.f90 energy.f90 init.f90 DIIS.f90 RHF.f90 UHF.f90 force.f90  HF.f90 -o HF.x
 
 
 ################################

@@ -152,7 +152,7 @@ MODULE RHF
         ! ---------
         ! SCF Cycle
         ! ---------
-        SUBROUTINE RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
+        SUBROUTINE RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,Pold,verbose)
             ! --------------------------------
             ! Compute total energy (SCF cycle)
             ! --------------------------------
@@ -178,18 +178,18 @@ MODULE RHF
             ! Matrices
             ! --------
 
-            REAL*8, dimension(Kf,Kf) :: S           ! Overlap matrix
-            REAL*8, dimension(Kf,Kf) :: X           ! Transformation matrix
+            REAL*8, dimension(Kf,Kf) :: S                   ! Overlap matrix
+            REAL*8, dimension(Kf,Kf) :: X                   ! Transformation matrix
 
-            REAL*8, dimension(Kf,Kf) :: Hc          ! Core Hamiltonian
+            REAL*8, dimension(Kf,Kf) :: Hc                  ! Core Hamiltonian
 
-            REAL*8, dimension(Kf,Kf) :: Pold        ! Old density matrix
-            REAL*8, dimension(Kf,Kf) :: Pnew        ! New density matrix
+            REAL*8, dimension(Kf,Kf), intent(out) :: Pold   ! Old density matrix
+            REAL*8, dimension(Kf,Kf) :: Pnew                ! New density matrix
 
-            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee    ! List of electron-electron integrals
+            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee            ! List of electron-electron integrals
 
-            REAL*8, dimension(Kf,Kf) :: F           ! Fock matrix
-            REAL*8, dimension(Kf) :: E              ! Orbital energies
+            REAL*8, dimension(Kf,Kf) :: F                   ! Fock matrix
+            REAL*8, dimension(Kf) :: E                      ! Orbital energies
 
             ! --------------
             ! SCF parameters
@@ -304,7 +304,7 @@ MODULE RHF
         ! ------------------
         ! SCF STEP WITH DIIS
         ! ------------------
-        SUBROUTINE RHF_step_DIIS(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose,Flist,Elist)
+        SUBROUTINE RHF_step_DIIS(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose,Flist,Elist,DIIS_step)
             ! -------------------------------------------------------------------------------------------
             ! Perform a single step of the SCF procedure to solve Roothan equations using DIIS algorithm.
             ! -------------------------------------------------------------------------------------------
@@ -327,11 +327,14 @@ MODULE RHF
             REAL*8, dimension(Kf,Kf) :: Fx                                  ! Fock matrix in the orthogonal basis set
             REAL*8, dimension(Kf,Kf) :: Cx                                  ! Coefficient matrix in the orthogonal basis set
             REAL*8, dimension(Kf,Kf) :: C                                   ! Coefficient matrix in the original basis set
+            REAL*8, dimension(Kf*Kf) :: error
+            REAL*8 :: maxerror
 
             ! INPUT / OUTPUT
             REAL*8, dimension(Kf,Kf), intent(inout) :: F                    ! Fock operator (input for the first guess)
             REAL*8, allocatable, dimension(:,:,:), intent(inout) :: Flist   ! List of Fock operators
             REAL*8, allocatable, dimension(:,:), intent(inout) :: Elist     ! Error list
+            INTEGER, intent(inout) :: DIIS_step                             ! DIIS step counter
 
             ! OUTPUT
             REAL*8, dimension(Kf,Kf), intent(out) :: Pnew                   ! New density matrix
@@ -359,8 +362,19 @@ MODULE RHF
 
             END IF
 
-            ! Update Fock matrix following DIIS algorithm
-            CALL DIIS_Fock(Kf,step,F,Pold,S,X,Flist,elist)
+            CALL DIIS_error(Kf,F,Pold,S,X,error,maxerror)
+
+            IF (maxerror .LT. 1.0D-1) THEN ! Initiate DIIS procedure
+
+                WRITE(*,*)
+                WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+
+                DIIS_step = DIIS_step + 1
+
+                ! Update Fock matrix following DIIS algorithm
+                CALL DIIS_Fock(Kf,DIIS_step,F,Pold,S,X,Flist,Elist)
+
+            END IF
 
             IF (verbose) THEN
                 WRITE(*,*)
@@ -408,7 +422,7 @@ MODULE RHF
         ! -------------------
         ! SCF CYCLE WITH DIIS
         ! -------------------
-        SUBROUTINE RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
+        SUBROUTINE RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,Pold,verbose)
             ! ------------------------------------------------------
             ! Compute total energy (SCF cycle) using DIIS algorithm.
             ! ------------------------------------------------------
@@ -446,18 +460,18 @@ MODULE RHF
             ! Matrices
             ! --------
 
-            REAL*8, dimension(Kf,Kf) :: S           ! Overlap matrix
-            REAL*8, dimension(Kf,Kf) :: X           ! Transformation matrix
+            REAL*8, dimension(Kf,Kf) :: S                   ! Overlap matrix
+            REAL*8, dimension(Kf,Kf) :: X                   ! Transformation matrix
 
-            REAL*8, dimension(Kf,Kf) :: Hc          ! Core Hamiltonian
+            REAL*8, dimension(Kf,Kf) :: Hc                  ! Core Hamiltonian
 
-            REAL*8, dimension(Kf,Kf) :: Pold        ! Old density matrix
-            REAL*8, dimension(Kf,Kf) :: Pnew        ! New density matrix
+            REAL*8, dimension(Kf,Kf), intent(out) :: Pold   ! Old density matrix
+            REAL*8, dimension(Kf,Kf) :: Pnew                ! New density matrix
 
-            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee    ! List of electron-electron integrals
+            REAl*8, dimension(Kf,Kf,Kf,Kf) :: ee            ! List of electron-electron integrals
 
-            REAL*8, dimension(Kf,Kf) :: F           ! Fock matrix
-            REAL*8, dimension(Kf) :: E              ! Orbital energies
+            REAL*8, dimension(Kf,Kf) :: F                   ! Fock matrix
+            REAL*8, dimension(Kf) :: E                      ! Orbital energies
 
             ! --------------
             ! SCF parameters
@@ -465,7 +479,8 @@ MODULE RHF
 
             LOGICAL :: converged                    ! Convergence parameter
             INTEGER, PARAMETER :: maxiter = 500     ! Maximal number of iterations (TODO: user defined maxiter)
-            INTEGER :: step                         ! SCF steps counter
+            INTEGER :: step                         ! SCF step counter
+            INTEGER :: DIIS_step                    ! DIIS step counter
 
             !!!
             !!! NEVER INITIALIZE ON DECLARATION VARIABLES OTHER THAN PARAMETERS
@@ -476,6 +491,7 @@ MODULE RHF
 
             converged = .FALSE.
             step = 0
+            DIIS_step = 0
 
             ! ------------------
             ! RHF initialization
@@ -538,7 +554,7 @@ MODULE RHF
                 !
                 ! ------------------------------------------------------------------------
                 !
-                CALL RHF_step_DIIS(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose,Flist,Elist)
+                CALL RHF_step_DIIS(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose,Flist,Elist,DIIS_step)
                 !
                 ! ------------------------------------------------------------------------
                 !

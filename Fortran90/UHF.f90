@@ -220,7 +220,7 @@ MODULE UHF
         ! ---------
         ! SCF Cycle
         ! ---------
-        SUBROUTINE UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,verbose)
+        SUBROUTINE UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,Ptot,verbose)
             ! --------------------------------
             ! Compute total energy (SCF cycle)
             ! --------------------------------
@@ -240,7 +240,8 @@ MODULE UHF
             LOGICAL, intent(in) :: verbose                              ! Verbose flag
 
             ! OUTPUT
-            REAL*8,intent(out) :: final_E ! Converged total energy
+            REAL*8,intent(out) :: final_E                               ! Converged total energy
+            REAl*8, dimension(Kf,Kf), intent(out) :: Ptot               ! Total density matrix
 
             ! --------
             ! Matrices
@@ -322,8 +323,8 @@ MODULE UHF
             ! Initial guess
             ! -------------
 
-            CALL huckel_guess(Kf,Hc,S,Fa,1.75D0)
-            CALL huckel_guess(Kf,Hc,S,Fb,1.75D0)
+            CALL huckel_guess(Kf,Hc,S,Fa,1.3D0)
+            CALL huckel_guess(Kf,Hc,S,Fb,1.5D0)
 
             ! ---------
             ! SCF cycle
@@ -373,6 +374,8 @@ MODULE UHF
                 WRITE(*,*) "SCF NOT CONVERGED!"
                 CALL EXIT(-1)
             END IF
+
+            Ptot = Paold + Pbold
 
         END SUBROUTINE UHF_SCF
 

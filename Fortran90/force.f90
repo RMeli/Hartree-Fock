@@ -97,6 +97,7 @@ MODULE FORCES
             REAL*8 :: dEp, dEm
             REAL*8, dimension(Nn,3) :: Rnp, Rnm
             REAL*8, dimension(Kf,3) :: basis_RR                         ! Displaced basis set
+            REAl*8, dimension(Kf,Kf) :: P                               ! Density matrix
 
             ! PARAMETERS
             LOGICAL, PARAMETER :: scf_verbose = .FALSE.
@@ -126,11 +127,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -143,11 +144,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along x
@@ -171,11 +172,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -188,11 +189,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along y
@@ -216,11 +217,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -233,11 +234,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,scf_verbose)
+                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along z
