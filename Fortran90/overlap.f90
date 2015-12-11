@@ -23,6 +23,7 @@ MODULE OVERLAP
     USE FACT
     USE GAUSSIAN
     USE LA
+    USE MULTIPOLE, only: overlap_coeff_OS
 
     CONTAINS
 
@@ -105,6 +106,112 @@ MODULE OVERLAP
 
         END FUNCTION overlap_coeff
 
+        ! ------------------
+        ! OBARA-SAIKA SCHEME
+        ! ------------------
+
+        FUNCTION S00(aa,bb,Rai,Rbi)
+            ! -----------------------------------------------------------
+            ! Compute overlap between Gaussian with zero angular momentum
+            ! -----------------------------------------------------------
+            !
+            ! Source:
+            !   T. Helgaker, P. Jørgensen and J. Olsen
+            !   Molecular Electronic-Structure Theory
+            !   Wiley
+            !   2000
+            !
+            ! -----------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            REAL*8, intent(in) :: aa, bb    ! Exponential coefficients of the Gaussians
+            REAL*8, intent(in) :: Rai, Rbi  ! Centers of the Gaussians
+
+            ! OUTPUT
+            REAL*8 :: S00
+
+            S00 = DSQRT(PI / (aa + bb)) * DEXP(-(aa * bb) / (aa + bb) * (Rai - Rbi)**2.0D0)
+
+        END FUNCTION S00
+
+
+
+        FUNCTION Sij(a,b,aa,bb,Rai,Rbi,Rpi)
+            ! ------------------------------------------------------------------------
+            ! Compute overlap between Gaussian along one direction using OS recursion.
+            ! ------------------------------------------------------------------------
+            !
+            ! Source:
+            !   T. Helgaker, P. Jørgensen and J. Olsen
+            !   Molecular Electronic-Structure Theory
+            !   Wiley
+            !   2000
+            !
+            ! ------------------------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: a,b          ! Angular momentum coefficients of the Gaussians along direction i
+            REAL*8, intent(in) :: aa, bb        ! Exponential coefficients of the Gaussians
+            REAL*8, intent(in) :: Rai, Rbi      ! Centers of the Gaussians
+            REAL*8, intent(in) :: Rpi           ! Center of Gaussian product
+
+            ! INTERMEDIATE VARIABLE
+            REAL*8, dimension(-1:a+1,-1:b+1) :: S   ! Vector of overlap coefficients
+            INTEGER :: i, j
+
+            ! OUTPUT
+            REAL*8 :: Sij                       ! Overlap integral
+
+            S(-1,:) = 0.0D0
+            S(:,-1) = 0.0D0
+
+            S(0,0) = S00(aa,bb,Rai,Rbi)
+
+            DO i = 0, a
+                DO j = 0, b
+                    S(i+1,j) = (Rpi - Rai) * S(i,j) + 1.0D0 / (2 * (aa+bb)) * (i * S(i-1,j) + j * S(i,j-1))
+                    S(i,j+1) = (Rpi - Rbi) * S(i,j) + 1.0D0 / (2 * (aa+bb)) * (i * S(i-1,j) + j * S(i,j-1))
+                END DO
+            END DO
+
+            Sij = S(a,b)
+
+        END FUNCTION Sij
+
+        FUNCTION overlap_coeff_OS(ax,ay,az,bx,by,bz,aa,bb,Ra,Rb) result(S)
+            ! ------------------------------------------------------------------------------------
+            ! Compute overlap integral between two Cartesian Gaussian functions using OS recursion
+            ! ------------------------------------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: ax, ay, az, bx, by, bz ! Angular momentum coefficients
+            REAL*8, intent(in) :: aa, bb ! Exponential Gaussian coefficients
+            REAL*8, dimension(3), intent(in) :: Ra, Rb ! Gaussian centers
+
+            ! INTERMEDIATE VARIABLES
+            REAL*8 :: pp ! Gaussian produc exponential coefficient
+            REAL*8, dimension(3) :: Rp ! Gaussian produc center
+            REAL*8 :: cp ! Gaussian product multiplicative constant
+
+            ! OUTPUT
+            REAL*8 :: S
+
+            CALL gaussian_product(aa,bb,Ra,Rb,pp,Rp,cp) ! Compute PP, RP and CP
+
+            S = 1
+            S = S * Sij(ax,bx,aa,bb,Ra(1),Rb(1),Rp(1))       ! Overlap along x
+            S = S * Sij(ay,by,aa,bb,Ra(2),Rb(2),Rp(2))       ! Overlap along y
+            S = S * Sij(az,bz,aa,bb,Ra(3),Rb(3),Rp(3))       ! Overlap along z
+            S = S * norm(ax,ay,az,aa) * norm(bx,by,bz,bb)    ! Normalization of Gaussian functions
+
+        END FUNCTION overlap_coeff_OS
+
 
 
         ! -------------
@@ -141,7 +248,7 @@ MODULE OVERLAP
                     DO k = 1,c
                         DO l = 1,c
                             tmp = basis_D(i,k) * basis_D(j,l)
-                            tmp = tmp * overlap_coeff(  basis_L(i,1),&  ! lx for basis function i
+                            tmp = tmp * overlap_coeff_OS(  basis_L(i,1),&  ! lx for basis function i
                                                         basis_L(i,2),&  ! ly for basis function i
                                                         basis_L(i,3),&  ! lz for basis function i
                                                         basis_L(j,1),&  ! lx for basis function j
