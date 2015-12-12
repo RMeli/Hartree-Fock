@@ -304,7 +304,7 @@ MODULE RHF
         ! ------------------
         ! SCF STEP WITH DIIS
         ! ------------------
-        SUBROUTINE RHF_step_DIIS(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose,Flist,Elist,DIIS_step)
+        SUBROUTINE RHF_step_DIIS(Kf,Ne,H,S,X,ee,Pold,Pnew,F,orbitalE,step,verbose,Flist,Elist,DIIS_step,DIIS_flag)
             ! -------------------------------------------------------------------------------------------
             ! Perform a single step of the SCF procedure to solve Roothan equations using DIIS algorithm.
             ! -------------------------------------------------------------------------------------------
@@ -335,6 +335,7 @@ MODULE RHF
             REAL*8, allocatable, dimension(:,:,:), intent(inout) :: Flist   ! List of Fock operators
             REAL*8, allocatable, dimension(:,:), intent(inout) :: Elist     ! Error list
             INTEGER, intent(inout) :: DIIS_step                             ! DIIS step counter
+            LOGICAL, intent(inout) :: DIIS_flag                             ! DIIS algorithm flag
 
             ! OUTPUT
             REAL*8, dimension(Kf,Kf), intent(out) :: Pnew                   ! New density matrix
@@ -360,20 +361,31 @@ MODULE RHF
 
                 F = H + G ! Compute new Fock operator
 
+                IF (DIIS_flag .EQV. .FALSE.) THEN
+                    CALL DIIS_error(Kf,F,Pold,S,X,error,maxerror)
+
+                    IF (maxerror .LT. 1.0D-1) THEN ! Initiate DIIS procedure
+
+                        DIIS_flag = .TRUE.
+
+                        WRITE(*,*)
+                        WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+
+                    END IF
+                END IF
+
             END IF
 
-            CALL DIIS_error(Kf,F,Pold,S,X,error,maxerror)
+            ! --------------
+            ! DIIS ALGORITHM
+            ! --------------
+            !DIIS_flag = .TRUE.
 
-            IF (maxerror .LT. 1.0D-1) THEN ! Initiate DIIS procedure
-
-                WRITE(*,*)
-                WRITE(*,*) "Using DIIS accelerated SCF algorithm."
-
+            IF (DIIS_flag .EQV. .TRUE.) THEN
                 DIIS_step = DIIS_step + 1
 
                 ! Update Fock matrix following DIIS algorithm
                 CALL DIIS_Fock(Kf,DIIS_step,F,Pold,S,X,Flist,Elist)
-
             END IF
 
             IF (verbose) THEN
@@ -481,6 +493,7 @@ MODULE RHF
             INTEGER, PARAMETER :: maxiter = 500     ! Maximal number of iterations (TODO: user defined maxiter)
             INTEGER :: step                         ! SCF step counter
             INTEGER :: DIIS_step                    ! DIIS step counter
+            LOGICAL :: DIIS_flag                    ! DIIS algorithm flag
 
             !!!
             !!! NEVER INITIALIZE ON DECLARATION VARIABLES OTHER THAN PARAMETERS
@@ -492,6 +505,7 @@ MODULE RHF
             converged = .FALSE.
             step = 0
             DIIS_step = 0
+            DIIS_flag = .FALSE.
 
             ! ------------------
             ! RHF initialization
@@ -550,11 +564,11 @@ MODULE RHF
                     WRITE(*,*) "SCF step #", step
                     WRITE(*,*) "--------"
                 END IF
-
+                
                 !
                 ! ------------------------------------------------------------------------
                 !
-                CALL RHF_step_DIIS(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose,Flist,Elist,DIIS_step)
+                CALL RHF_step_DIIS(Kf,Ne,Hc,S,X,ee,Pold,Pnew,F,E,step,verbose,Flist,Elist,DIIS_step,DIIS_flag)
                 !
                 ! ------------------------------------------------------------------------
                 !

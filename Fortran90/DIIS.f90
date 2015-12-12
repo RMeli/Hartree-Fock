@@ -98,7 +98,7 @@ MODULE DIIS
 
 
 
-    SUBROUTINE DIIS_B(elist,steps,B)
+    SUBROUTINE DIIS_B(Kf,elist,steps,B)
         ! ----------------------------------------
         ! Compute matrix B of DIIS algorithm.
         ! ----------------------------------------
@@ -114,8 +114,9 @@ MODULE DIIS
         IMPLICIT NONE
 
         ! INPUT
+        INTEGER, intent(in) :: Kf                               ! Basis set size
         INTEGER, intent(in) :: steps                            ! Current SCF iteration
-        REAL*8, dimension(steps,steps), intent(in) :: elist     ! List of errors
+        REAL*8, dimension(steps,Kf*Kf), intent(in) :: elist     ! List of errors
 
         ! INTERMEDIATE VARIABLES
         INTEGER :: i, j
@@ -123,27 +124,25 @@ MODULE DIIS
         ! OUTPUT
         REAL*8, dimension(steps+1,steps+1), intent(out) :: B     ! Matrix B
 
+        !CALL print_real_matrix(steps,Kf*Kf,elist)
+
         DO i = 1, steps ! Rows of B
             DO j = 1, steps ! Cols of B
 
-                B(i,j) = DOT_PRODUCT(elist(:,i),elist(:,j))
+                B(i,j) = DOT_PRODUCT(elist(i,:),elist(j,:))
 
             END DO
         END DO
 
-        DO i = 1, steps
-            B(i,steps+1) = -1.0D0
-        END DO
+        B(:,steps+1) = -1.0D0
 
-        DO j = 1, steps
-            B(steps+1,j) = -1.0D0
-        END DO
+        B(steps+1,:) = -1.0D0
 
         B(steps+1,steps+1) = 0.0D0
 
     END SUBROUTINE DIIS_B
 
-    SUBROUTINE DIIS_weigts(step,B,w,info)
+    SUBROUTINE DIIS_weigts(dim,B,w,info)
         ! ---------------------------------------
         ! Compute DIIS weights.
         ! ---------------------------------------
@@ -159,28 +158,60 @@ MODULE DIIS
         IMPLICIT NONE
 
         ! INPUT
-        INTEGER, intent(in) :: step                         ! Current SCF step
-        REAL*8, dimension(step+1,step+1), intent(in) :: B   ! Matrix B
+        INTEGER, intent(in) :: dim                          ! Dimension of b
+        REAL*8, dimension(dim,dim), intent(in) :: B         ! Matrix B
 
         ! INTERMEDIATE VARIABLES
-        REAL*8, dimension(step+1) :: sol                    ! Solution of B*SOL=RHS (weight and Lagrande multiplier)
-        REAL*8, dimension(step+1) :: rhs                    ! Right hand side of the linear system
+        REAL*8, dimension(dim) :: sol                       ! Solution of B*SOL=RHS (weight and Lagrande multiplier)
+        REAL*8, dimension(dim) :: rhs                       ! Right hand side of the linear system
+        REAL*8, dimension(dim,dim) :: BB        ! Copy of matrix B (side effects) (TODO: avoid copy)
 
         ! OUTPUT
-        REAL*8, dimension(step), intent(out) :: w           ! Weights (SOL without the Lagrange multiplier)
+        REAL*8, dimension(dim-1), intent(out) :: w          ! Weights (SOL without the Lagrange multiplier)
         INTEGER, intent(out) :: info                        ! Information about the solution of the linear system
 
         rhs(:) = 0.0D0
 
-        rhs(step+1) = -1.0D0
+        rhs(dim) = -1.0D0
 
         !CALL print_real_matrix(step+1,step+1,B)
 
-        CALL LINEAR_SYSTEM(step+1,B,rhs,sol,info) ! Solve linear system B*SOL=RHS
+        BB = B
 
-        w = sol(1:step) ! Discard Lagrange multiplier
+        CALL LINEAR_SYSTEM(dim,BB,rhs,sol,info) ! Solve linear system B*SOL=RHS
+
+        w = sol(1:dim-1) ! Discard Lagrange multiplier
 
     END SUBROUTINE DIIS_weigts
+
+    SUBROUTINE DIIS_reduce_B(dim,B)
+        ! ---------------------------------------------------------------
+        ! Reduce the matrix B by one in order to eliminate ill behaviour.
+        ! ---------------------------------------------------------------
+
+        IMPLICIT NONE
+
+        ! INPUT
+        INTEGER, intent(in) :: dim
+        REAL*8, allocatable, dimension(:,:), intent(inout) :: B
+
+        ! INTERMEDIATE VARIABLES
+        REAL*8, allocatable, dimension(:,:) :: BB
+        INTEGER :: i, j
+
+        ALLOCATE(BB(dim-1,dim-1))
+
+        DO i = 2, dim
+            DO j = 2, dim
+                BB(i-1,j-1) = B(i,j)
+            END DO
+        END DO
+
+        DEALLOCATE(B)
+
+        CALL MOVE_ALLOC(BB,B)
+
+    END SUBROUTINE DIIS_reduce_B
 
     SUBROUTINE DIIS_Fock(Kf,step,F,P,S,X,Flist,elist)
         ! ----------------------------
@@ -204,41 +235,66 @@ MODULE DIIS
         ! INTERMEDIATE VARIABLES
         REAL*8, dimension(Kf*Kf) :: error                               ! Error vector at current SCF step
         REAL*8 :: maxerror                                              ! Maximal error at current iteration
-        REAL*8, dimension(step+1,step+1) :: B                           ! Matrix B
-        REAL*8, dimension(step) :: w                                    ! Weights
-        INTEGER :: i                                                    ! Loop index
+        REAL*8, allocatable, dimension(:,:) :: B                        ! Matrix B
+        REAL*8, allocatable, dimension(:) :: w                          ! Weights
+        INTEGER :: i, j                                                 ! Loop index
         INTEGER :: info                                                 ! Information about the solution of the linear system
+        INTEGER :: dim                                                  ! Actual dimension of the linear system
 
         ! Compute error at current iteration
         CALL DIIS_error(Kf,F,P,S,X,error,maxerror)
+
+        WRITE(*,*) "#########"
+        WRITE(*,*) "MAXERROR:", maxerror
+        WRITE(*,*) "#########"
 
         ! Store Fock matrix and error vector
         CALL addFock(Kf,step,Flist,F)
         CALL addError(Kf,step,elist,error)
 
-        ! Compute matrix B
-        CALL DIIS_B(elist,step,B)
+        info = -1
+        dim = step+1
 
-        ! Compute weights
-        CALL DIIS_weigts(step,B,w,info)
+        ALLOCATE(B(dim,dim))
+        ALLOCATE(w(dim-1))
 
-        IF (info .EQ. 0) THEN ! Solution of the linear system is possible
+        CALL DIIS_B(Kf,elist,step,B)
 
-            F(:,:) = 0.0D0 ! Erase current Fock matrix F (already stored in FLIST)
+        DO WHILE (info .NE. 0)
 
-            ! Create a new Fock matrix according to the DIIS algorithm
-            DO i = 1, step
-                F = F + w(i) * Flist(i,:,:)
-            END DO
+            CALL DIIS_weigts(dim,B,w,info)
 
-        ELSE
-            WRITE(*,*) "IMPOSSIBLE SOLUTION OF THE LINEAR SYSTEM"
-        END IF
+            IF (info .NE. 0) THEN
+                WRITE(*,*)
+                WRITE(*,*) "IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM: REDUCING MATRIX B"
 
-        WRITE(*,*) "##########"
-        WRITE(*,*) "MAX ERROR:", maxerror
-        WRITE(*,*) "##########"
+                CALL DIIS_reduce_B(dim,B)
 
+                dim = dim - 1
+
+                DEALLOCATE(w)
+                ALLOCATE(w(dim-1))
+            END IF
+
+        END DO
+
+        WRITE(*,*)
+        WRITE(*,*) "SOLVED DIIS SYSTEM."
+
+        w = w(dim-1:1:-1)
+
+        F(:,:) = 0.0D0 ! Erase current Fock matrix F (already stored in FLIST)
+
+        ! Create a new Fock matrix according to the DIIS algorithm
+        j = step
+
+        DO i = 1,dim-1
+
+            F = F + w(i) * Flist(j,:,:)
+
+            j = j - 1
+
+        END DO
 
     END SUBROUTINE
 
