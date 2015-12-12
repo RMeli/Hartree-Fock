@@ -23,7 +23,6 @@ MODULE OVERLAP
     USE FACT
     USE GAUSSIAN
     USE LA
-    USE MULTIPOLE, only: overlap_coeff_OS
 
     CONTAINS
 
@@ -248,16 +247,16 @@ MODULE OVERLAP
                     DO k = 1,c
                         DO l = 1,c
                             tmp = basis_D(i,k) * basis_D(j,l)
-                            tmp = tmp * overlap_coeff_OS(  basis_L(i,1),&  ! lx for basis function i
-                                                        basis_L(i,2),&  ! ly for basis function i
-                                                        basis_L(i,3),&  ! lz for basis function i
-                                                        basis_L(j,1),&  ! lx for basis function j
-                                                        basis_L(j,2),&  ! ly for basis function j
-                                                        basis_L(j,3),&  ! lz for basis function j
-                                                        basis_A(i,k),&  ! Exponential coefficient for basis function i, contraction k
-                                                        basis_A(j,l),&  ! Exponential coefficient for basis function j, contraction l
-                                                        basis_R(i,:),&  ! Center of basis function i
-                                                        basis_R(j,:))   ! Center of basis function j
+                            tmp = tmp * overlap_coeff_OS(   basis_L(i,1),&  ! lx for basis function i
+                                                            basis_L(i,2),&  ! ly for basis function i
+                                                            basis_L(i,3),&  ! lz for basis function i
+                                                            basis_L(j,1),&  ! lx for basis function j
+                                                            basis_L(j,2),&  ! ly for basis function j
+                                                            basis_L(j,3),&  ! lz for basis function j
+                                                            basis_A(i,k),&  ! Exponential coefficient for basis function i, contraction k
+                                                            basis_A(j,l),&  ! Exponential coefficient for basis function j, contraction l
+                                                            basis_R(i,:),&  ! Center of basis function i
+                                                            basis_R(j,:))   ! Center of basis function j
 
                             S(i,j) = S(i,j) + tmp
                         END DO ! l

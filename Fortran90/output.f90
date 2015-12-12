@@ -49,6 +49,26 @@ MODULE OUTPUT
 
 
 
+        SUBROUTINE print_real_vector(d,v)
+            ! ---------------------------------------------------------
+            ! Print vector V of dimension D containing REAL*8 elements.
+            ! ---------------------------------------------------------
+
+            IMPLICIT NONE
+
+            ! INPUT
+            INTEGER, intent(in) :: d
+            REAL*8, dimension(d), intent(in) :: v
+
+            ! INTERMEDIATE VARIABLES
+            INTEGER :: i
+
+            DO i = 1, d
+                WRITE(*,'(20G16.6)') v(i)
+            END DO
+
+        END SUBROUTINE print_real_vector
+
         SUBROUTINE print_integer_matrix(r,c,M)
             ! -----------------------------------------------
             ! Print RxC matrix M containing INTEGER elements.
