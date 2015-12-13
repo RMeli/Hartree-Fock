@@ -196,7 +196,7 @@ MODULE RHF
             ! --------------
 
             LOGICAL :: converged                    ! Convergence parameter
-            INTEGER, PARAMETER :: maxiter = 500     ! Maximal number of iterations (TODO: user defined maxiter)
+            INTEGER, PARAMETER :: maxiter = 1000    ! Maximal number of iterations (TODO: user defined maxiter)
             INTEGER :: step                         ! SCF steps counter
 
             !!!
@@ -490,7 +490,7 @@ MODULE RHF
             ! --------------
 
             LOGICAL :: converged                    ! Convergence parameter
-            INTEGER, PARAMETER :: maxiter = 500     ! Maximal number of iterations (TODO: user defined maxiter)
+            INTEGER, PARAMETER :: maxiter = 1000    ! Maximal number of iterations (TODO: user defined maxiter)
             INTEGER :: step                         ! SCF step counter
             INTEGER :: DIIS_step                    ! DIIS step counter
             LOGICAL :: DIIS_flag                    ! DIIS algorithm flag
@@ -564,7 +564,7 @@ MODULE RHF
                     WRITE(*,*) "SCF step #", step
                     WRITE(*,*) "--------"
                 END IF
-                
+
                 !
                 ! ------------------------------------------------------------------------
                 !

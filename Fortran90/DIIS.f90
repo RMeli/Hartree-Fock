@@ -214,9 +214,17 @@ MODULE DIIS
     END SUBROUTINE DIIS_reduce_B
 
     SUBROUTINE DIIS_Fock(Kf,step,F,P,S,X,Flist,elist)
-        ! ----------------------------
-        ! Compute the DIIS Fock matrix
-        ! ----------------------------
+        ! ---------------------------------------
+        ! Compute the DIIS Fock matrix.
+        ! ---------------------------------------
+        !
+        ! Source:
+        !   P. Pulay
+        !   Improved SCF Convergence Acceleration
+        !   Journal of Computatuonal Chemistry
+        !   1982
+        !
+        ! ---------------------------------------
 
         IMPLICIT NONE
 
@@ -264,14 +272,15 @@ MODULE DIIS
 
             CALL DIIS_weigts(dim,B,w,info)
 
-            IF (info .NE. 0) THEN
+            IF (info .NE. 0) THEN ! Check the solution of the system
                 WRITE(*,*)
                 WRITE(*,*) "IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM: REDUCING MATRIX B"
 
-                CALL DIIS_reduce_B(dim,B)
+                CALL DIIS_reduce_B(dim,B) ! Reduce B in order to eliminate ill behaviour
 
-                dim = dim - 1
+                dim = dim - 1 ! Reduce dimensionality of the system
 
+                ! Deallocate/allocate weight vector (TODO: useless/performance)
                 DEALLOCATE(w)
                 ALLOCATE(w(dim-1))
             END IF

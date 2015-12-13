@@ -123,7 +123,7 @@ PROGRAM HF
             WRITE(*,*)
             WRITE(*,*)
 
-            CALL UHF_SCF(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,P,.TRUE.)
+            CALL UHF_DIIS(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,Zn,Rn,final_E,P,.TRUE.)
 
             CALL dipole(K,c,Nn,basis_D,basis_A,basis_L,basis_R,P,Rn,Zn,mu)
 
