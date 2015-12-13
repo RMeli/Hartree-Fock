@@ -213,7 +213,7 @@ MODULE DIIS
 
     END SUBROUTINE DIIS_reduce_B
 
-    SUBROUTINE DIIS_Fock(Kf,step,F,P,S,X,Flist,elist)
+    SUBROUTINE DIIS_Fock(Kf,step,F,P,S,X,Flist,elist,verbose)
         ! ---------------------------------------
         ! Compute the DIIS Fock matrix.
         ! ---------------------------------------
@@ -234,6 +234,7 @@ MODULE DIIS
         REAL*8, dimension(Kf,Kf), intent(in) :: P           ! Current density matrix
         REAL*8, dimension(Kf,Kf), intent(in) :: S           ! Overlap matrix
         REAL*8, dimension(Kf,Kf), intent(in) :: X           ! Transformation matrix
+        LOGICAL, intent(in) :: verbose                      ! verbosity flag
 
         ! INPUT/OUTPUT
         REAL*8, allocatable, dimension(:,:,:), intent(inout) :: Flist   ! List of Fock matrices
@@ -252,9 +253,9 @@ MODULE DIIS
         ! Compute error at current iteration
         CALL DIIS_error(Kf,F,P,S,X,error,maxerror)
 
-        WRITE(*,*) "#########"
-        WRITE(*,*) "MAXERROR:", maxerror
-        WRITE(*,*) "#########"
+        !WRITE(*,*) "#########"
+        !WRITE(*,*) "MAXERROR:", maxerror
+        !WRITE(*,*) "#########"
 
         ! Store Fock matrix and error vector
         CALL addFock(Kf,step,Flist,F)
@@ -273,8 +274,11 @@ MODULE DIIS
             CALL DIIS_weigts(dim,B,w,info)
 
             IF (info .NE. 0) THEN ! Check the solution of the system
-                WRITE(*,*)
-                WRITE(*,*) "IMPOSSIBLE TO SOLVE THE LINEAR SYSTEM: REDUCING MATRIX B"
+
+                IF (verbose .EQV. .TRUE.) THEN
+                    WRITE(*,*)
+                    WRITE(*,*) "IMPOSSIBLE TO SOLVE THE DIIS LINEAR SYSTEM: REDUCING MATRIX B"
+                END IF
 
                 CALL DIIS_reduce_B(dim,B) ! Reduce B in order to eliminate ill behaviour
 
@@ -287,8 +291,10 @@ MODULE DIIS
 
         END DO
 
-        WRITE(*,*)
-        WRITE(*,*) "SOLVED DIIS SYSTEM."
+        IF (verbose .EQV. .TRUE.) THEN
+            WRITE(*,*)
+            WRITE(*,*) "SOLVED DIIS LINEAR SYSTEM."
+        END IF
 
         w = w(dim-1:1:-1)
 

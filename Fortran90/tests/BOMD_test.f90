@@ -42,7 +42,8 @@ PROGRAM BOMD_test
 
     REAL*8, allocatable, dimension(:,:) :: F                ! Forces
 
-    CHARACTER (len=4) :: calculation                        ! Type of calculation
+    CHARACTER (len=5) :: calculation                        ! Type of calculation
+    CHARACTER (len=3) :: method                             ! Type of calculation
 
     REAL*8, allocatable, dimension(:,:) :: vel              ! Nuclear velocities
     REAL*8, allocatable, dimension(:) :: mass             ! Nuclear mass
@@ -58,7 +59,7 @@ PROGRAM BOMD_test
     ! LOAD SYSTEM AND BASIS SET INFORMATIONS FROM FILE
     ! ------------------------------------------------
 
-    CALL load("tests/H2_f_stretched.in",calculation,Ne,Nn,K,c,pos,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
+    CALL load("tests/H2_f_stretched.in",calculation,method,Ne,Nn,K,c,pos,Zn,basis_R,basis_L,basis_A,basis_D,basis_idx)
 
     ALLOCATE(F(Nn,3),mass(Nn),vel(Nn,3),atoms(Nn))
 
@@ -74,7 +75,7 @@ PROGRAM BOMD_test
     ! ----
 
     ! Initial force
-    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,pos,F,1D-4)
+    CALL force_fd(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,pos,F,1D-4,"UHF")
 
     OPEN(unit=123,file="BOMD.xyz",form="formatted",status="new",action="write") ! Open file 123
 
@@ -82,7 +83,7 @@ PROGRAM BOMD_test
         WRITE(*,*) "Step", i
         WRITE(*,*) "Distance: ", DSQRT(DOT_PRODUCT(pos(1,:)-pos(2,:),pos(1,:)-pos(2,:)))
         CALL append_xyz(Nn,atoms,pos,123)
-        CALL BO_step(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,mass,pos,vel,F,dt)
+        CALL BO_step(K,c,Ne,Nn,basis_D,basis_A,basis_L,basis_R,basis_idx,Zn,mass,pos,vel,F,dt,"UHF")
     END DO
 
     CLOSE(unit=123) ! Close file 123

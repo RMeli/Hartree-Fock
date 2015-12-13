@@ -368,8 +368,10 @@ MODULE RHF
 
                         DIIS_flag = .TRUE.
 
-                        WRITE(*,*)
-                        WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+                        IF (verbose .EQV. .TRUE.) THEN
+                            WRITE(*,*)
+                            WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+                        END IF
 
                     END IF
                 END IF
@@ -385,7 +387,7 @@ MODULE RHF
                 DIIS_step = DIIS_step + 1
 
                 ! Update Fock matrix following DIIS algorithm
-                CALL DIIS_Fock(Kf,DIIS_step,F,Pold,S,X,Flist,Elist)
+                CALL DIIS_Fock(Kf,DIIS_step,F,Pold,S,X,Flist,Elist,verbose)
             END IF
 
             IF (verbose) THEN
@@ -546,8 +548,8 @@ MODULE RHF
             ! Initial guess
             ! -------------
 
-            !CALL core_guess(Kf,Hc,F)
-            CALL huckel_guess(Kf,Hc,S,F,1.750D0)
+            CALL core_guess(Kf,Hc,F)
+            !CALL huckel_guess(Kf,Hc,S,F,1.750D0)
 
             ! ---------
             ! SCF cycle

@@ -28,8 +28,8 @@ MODULE INPUT
             IMPLICIT NONE
 
             ! OUTPUT
-            CHARACTER (len=5), intent(out):: calculation    ! Calculation name
-            CHARACTER (len=3), intent(out):: method         ! Method
+            CHARACTER (len=*), intent(out):: calculation    ! Calculation name
+            CHARACTER (len=*), intent(out):: method         ! Method
             INTEGER, intent(out) :: Ne                      ! Number of electrons
             INTEGER, intent(out) :: Nn                      ! Number of nuclei
             INTEGER, intent(out) :: K                       ! Basis set size
@@ -47,6 +47,8 @@ MODULE INPUT
             REAL*8, allocatable, dimension(:,:) :: basis_A      ! Contraction exponential coefficients
             REAL*8, allocatable, dimension(:,:) :: basis_D      ! Conttaction linear coefficients
             INTEGER, allocatable, dimension(:) :: basis_idx     ! Basis set atom index
+
+            WRITE(*,*) "Opening file: ", fname
 
             ! Open file containing system and basis set informations
             OPEN(unit=100,file=fname,form="formatted",status="old",action="read")

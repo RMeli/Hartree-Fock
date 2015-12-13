@@ -127,11 +127,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -144,11 +144,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along x
@@ -172,11 +172,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -189,11 +189,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along y
@@ -217,11 +217,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnp,dEp,P,scf_verbose)
             END IF
 
             ! Displace atom and basis set at new atomic position
@@ -234,11 +234,11 @@ MODULE FORCES
             ! Total energy calculation at new atomic position
 
             IF (method .EQ. "RHF") THEN
-                CALL RHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL RHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             IF (method .EQ. "UHF") THEN
-                CALL UHF_SCF(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
+                CALL UHF_DIIS(Kf,c,Ne,Nn,basis_D,basis_A,basis_L,basis_RR,Zn,Rnm,dEm,P,scf_verbose)
             END IF
 
             ! Compute force along z

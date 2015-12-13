@@ -486,8 +486,10 @@ MODULE UHF
 
                         DIIS_flag = .TRUE.
 
-                        WRITE(*,*)
-                        WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+                        IF (verbose .EQV. .TRUE.) THEN
+                            WRITE(*,*)
+                            WRITE(*,*) "Using DIIS accelerated SCF algorithm."
+                        END IF
 
                     END IF
                 END IF
@@ -502,8 +504,8 @@ MODULE UHF
                 DIIS_step = DIIS_step + 1
 
                 ! Update Fock matrix following DIIS algorithm
-                CALL DIIS_Fock(Kf,DIIS_step,Fa,Paold,S,X,Falist,Ealist)
-                CALL DIIS_Fock(Kf,DIIS_step,Fb,Pbold,S,X,Fblist,Eblist)
+                CALL DIIS_Fock(Kf,DIIS_step,Fa,Paold,S,X,Falist,Ealist,verbose)
+                CALL DIIS_Fock(Kf,DIIS_step,Fb,Pbold,S,X,Fblist,Eblist,verbose)
             END IF
 
 
@@ -703,8 +705,10 @@ MODULE UHF
             ! Initial guess
             ! -------------
 
-            CALL huckel_guess(Kf,Hc,S,Fa,1.75D0)
-            CALL huckel_guess(Kf,Hc,S,Fb,1.75D0)
+            CALL core_guess(Kf,Hc,Fa)
+            CALL core_guess(Kf,Hc,Fb)
+            !CALL huckel_guess(Kf,Hc,S,Fa,1.75D0)
+            !CALL huckel_guess(Kf,Hc,S,Fb,1.75D0)
 
             ! ---------
             ! SCF cycle
