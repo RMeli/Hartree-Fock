@@ -27,7 +27,7 @@ PROGRAM HF
 
     IMPLICIT NONE
 
-    CHARACTER (len=20) :: fname ! Input filename
+    CHARACTER (len=50) :: fname ! Input filename
     INTEGER :: nargs            ! Number of input arguments
 
     INTEGER :: i ! Loop index

@@ -193,13 +193,21 @@ class IO:
     def __init__(self,fname):
 
         # Open input file
-        self.ifile = open(fname,'r')
+        try:
+            self.ifile = open(fname,'r')
+        except IOError:
+            print("ERROR: Impossible to open the input file.")
+            sys.exit(-1)
 
         # Create name for the output file
         fnameout = os.path.splitext(fname)[0] + "_f.in"
 
         # Open output file
-        self.ofile = open(fnameout, 'w') # Open output file (fortran input file)
+        try:
+            self.ofile = open(fnameout, 'w') # Open output file (fortran input file)
+        except IOError:
+            print("ERROR: Impossible to open the output file.")
+            sys.exit(-1)
 
         # Occupied orbitals
         self.orbitals = {   "H" : ["1s"],
@@ -332,4 +340,4 @@ if __name__ == "__main__":
 
     os.system("./HF.x " + ffin) # Call Fortran Hartree-Fock program
 
-    os.system("rm " + ffin) # Remove input for Fortran program
+    #os.system("rm " + ffin) # Remove input for Fortran program

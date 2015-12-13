@@ -296,6 +296,8 @@ MODULE DIIS
 
         END DO
 
+        DEALLOCATE(B,w)
+
     END SUBROUTINE
 
     SUBROUTINE addFock(Kf,step,Flist,F)
