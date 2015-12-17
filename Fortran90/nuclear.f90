@@ -105,128 +105,12 @@ MODULE NUCLEAR
                 boys = 1.0D0 / (2.0D0 * nu + 1.0D0) - x / (2.0D0 * nu + 3.0D0)
 
             ELSE
-                boys = 0.0D0
-                !idx = 0
 
                 boys = 0.5D0 * DGAMIT(nu + 0.5D0, x) * GAMMA(nu + 0.5D0)
-
-                !boys = boys * GAMMA(nu + 0.5D0)
-
-                !boys = 0.5D0 * boys / (x**(nu + 0.5D0))
+                
             END IF
 
         END FUNCTION boys
-
-
-        ! -------------
-        ! BOYS FUNCTION
-        ! -------------
-        !FUNCTION boys2(nu,x)
-            ! -------------------------------------------------------------------------
-            ! Boys function
-            ! -------------------------------------------------------------------------
-            !
-            ! Sources:
-            !
-            !   Weiss and Ochsenfeld
-            !   A Rigorous and Optimized Strategy for the Evaluation
-            !       of the Boys Function Kernel in Molecular Electronic StructureTheory
-            !   Journal of Computational Chemistry
-            !   2015
-            !
-            !   Handbook of Computational Chemistry
-            !   David Cook
-            !   Oxford University Press
-            !   1998
-            !
-            ! -------------------------------------------------------------------------
-
-        !    IMPLICIT NONE
-
-            ! INPUT
-        !    INTEGER, intent(in) :: nu
-        !    REAL*8, intent(in) :: x
-
-            ! INTERMEDIATE VARIABLES
-            !INTEGER :: i
-            !REAL*8 :: exp, fact
-            !REAL*8 :: b, bnew, sum,  resid
-        !    REAL :: result, abserr
-        !    INTEGER :: neval, ier
-
-            ! PARAMETERS
-            !INTEGER, PARAMETER :: trans = 10        ! Transition between small X and large X
-            !REAL*8, PARAMETER :: tol = 1.0D-12      ! Boys series convergence
-
-            ! OUTPUT
-        !    REAL*8 :: boys2
-
-        !    nunu = nu   ! Set global MODULE variable to input variable (side effect: change in INT)
-        !    xx = x      ! Set global MODULE variable to input variable (side effect: change in INT)
-
-            ! TODO DOUBLE precision routine
-        !    CALL qags(INTEGRAND,0.0,1.0,1.0E-5,1.0E-5, result, abserr, neval, ier) ! Call QUADPACK routine
-
-        !    IF (ier .NE. 0) THEN
-        !        WRITE(*,*) ier
-        !    END IF
-
-        !    boys2 = result
-
-        !    !boys = 0.0D0
-
-            !IF (nu == 0) THEN
-            !    boys = boys0(x) ! Call Boys function from Szabo and Ostlund
-            !IF (nu .LT. trans) THEN
-            !    resid = 1 ! Residual
-
-            !    exp = 0.5D0 * DEXP(-x) ! Multiplicative exponential factor
-
-            !    sum = DGAMMA(nu + 0.5D0) / DGAMMA(nu + 1.5D0) ! First term of the sum
-
-            !    b = exp * sum
-
-            !    i = 1 ! Start from second step
-            !    DO WHILE (resid .GT. tol) ! TODO Add maximal numbe of iterations
-            !        sum = sum + DGAMMA(nu + 0.5D0) * x**i / DGAMMA(nu + i + 1.5D0)
-
-            !        bnew = exp * sum
-            !        resid = ABS(bnew-b)
-
-            !        b = bnew
-
-            !        i = i + 1
-            !    END DO
-
-            !    boys = b
-
-            !ELSE
-            !    fact = DGAMMA(nu + 0.5D0) / (2.0D0 * x**(nu + 0.5D0))
-
-            !    exp = 0.5D0 * DEXP(-x) / x ! Multiplicative exponential factor
-
-            !    sum = DGAMMA(nu + 0.5D0) / DGAMMA(nu + 1.5D0) ! First term of the sum
-
-            !    b = fact - exp * sum
-
-            !    i = 1 ! Start from second step
-            !    DO WHILE (resid .GT. tol) ! TODO Add maximal numbe of iterations
-            !        sum = sum + DGAMMA(nu + 0.5D0) * x**(-i) / DGAMMA(nu - i + 1.5D0)
-
-            !        bnew = fact - exp * sum
-
-            !        resid = ABS(bnew-b)
-
-            !        b = bnew
-
-            !        i = i + 1
-            !    END DO
-
-            !    boys = b
-
-            !END IF
-
-        !END FUNCTION boys2
 
         FUNCTION A(l,r,i,l1,l2,Ra,Rb,Rc,Rp,eps)
             ! -------------------------------------
