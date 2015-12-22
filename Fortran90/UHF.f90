@@ -82,6 +82,8 @@ MODULE UHF
             REAL*8, dimension(Kf,Kf) :: Cb                       ! Coefficient matrix in the original basis set for beta spin
             INTEGER :: Nea                                       ! Alpha spin electrons
             INTEGER :: Neb                                       ! Beta spin electrons
+            REAL*8 :: mix                                        ! Mixing coefficient for alpha HOMO/LUMO
+            REAL*8, dimension(Kf) :: mix_HOMO                    ! Temporary storage of old HOMO coefficients
 
             ! INPUT / OUTPUT
             REAL*8, dimension(Kf,Kf), intent(inout) :: Fa        ! Fock operator for alpha spin
@@ -209,6 +211,17 @@ MODULE UHF
                 WRITE(*,*) "Coefficients (beta spin):"
                 CALL print_real_matrix(Kf,Kf,Cb)
             END IF
+
+            ! Mix alpha LUMO/HOMO orbitals in order to destroy spatial simmetry
+
+            !mix = 1.0D0
+
+            !IF ((step .EQ. 1) .AND. (Nea .EQ. Neb)) THEN
+            !    mix_HOMO = Ca(Nea,:)
+
+            !    Ca(Nea,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (Ca(Nea,:) + mix * Ca(Nea+1,:))
+            !    Ca(Nea+1,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (mix_HOMO - mix * Ca(Nea+1,:))
+            !END IF
 
             ! Update density
 
@@ -415,6 +428,8 @@ MODULE UHF
             REAL*8, dimension(Kf,Kf) :: Cb                       ! Coefficient matrix in the original basis set for beta spin
             INTEGER :: Nea                                       ! Alpha spin electrons
             INTEGER :: Neb                                       ! Beta spin electrons
+            REAL*8 :: mix                                        ! Mixing coefficient for alpha HOMO/LUMO
+            REAL*8, dimension(Kf) :: mix_HOMO                    ! Temporary storage of old HOMO coefficients
             REAL*8, dimension(Kf*Kf) :: errora
             REAL*8 :: maxerrora
             REAL*8, dimension(Kf*Kf) :: errorb
@@ -582,10 +597,22 @@ MODULE UHF
                 CALL print_real_matrix(Kf,Kf,Cb)
             END IF
 
+            ! Mix alpha LUMO/HOMO orbitals in order to destroy spatial simmetry
+
+            !mix = 1.0D0
+
+            !IF ((step .EQ. 1) .AND. (Nea .EQ. Neb)) THEN
+            !    mix_HOMO = Ca(Nea,:)
+
+            !    Ca(Nea,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (Ca(Nea,:) + mix * Ca(Nea+1,:))
+            !    Ca(Nea+1,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (mix_HOMO - mix * Ca(Nea+1,:))
+            !END IF
+
             ! Update density
 
             CALL P_density_spin(Kf,Nea,Ca,Panew) ! Compute new density matrix for alpha spin
             CALL P_density_spin(Kf,Neb,Cb,Pbnew) ! Compute new density matrix for beta spin
+
 
         END SUBROUTINE UHF_step_DIIS
 
