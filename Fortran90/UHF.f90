@@ -214,14 +214,14 @@ MODULE UHF
 
             ! Mix alpha LUMO/HOMO orbitals in order to destroy spatial simmetry
 
-            !mix = 1.0D0
+            mix = 1.0D0
 
-            !IF ((step .EQ. 1) .AND. (Nea .EQ. Neb)) THEN
-            !    mix_HOMO = Ca(Nea,:)
+            IF ((step .EQ. 1) .AND. (Nea .EQ. Neb)) THEN
+                mix_HOMO = Ca(Nea,:)
 
-            !    Ca(Nea,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (Ca(Nea,:) + mix * Ca(Nea+1,:))
-            !    Ca(Nea+1,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (mix_HOMO - mix * Ca(Nea+1,:))
-            !END IF
+                Ca(Nea,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (Ca(Nea,:) + mix * Ca(Nea+1,:))
+                Ca(Nea+1,:) = 1.0D0 / DSQRT(1.0D0 + mix**2) * (mix_HOMO - mix * Ca(Nea+1,:))
+            END IF
 
             ! Update density
 
@@ -337,8 +337,8 @@ MODULE UHF
             ! Initial guess
             ! -------------
 
-            CALL huckel_guess(Kf,Hc,S,Fa,1.3D0)
-            CALL huckel_guess(Kf,Hc,S,Fb,1.5D0)
+            CALL huckel_guess(Kf,Hc,S,Fa,1.45D0)
+            CALL huckel_guess(Kf,Hc,S,Fb,1.45D0)
 
             ! ---------
             ! SCF cycle
