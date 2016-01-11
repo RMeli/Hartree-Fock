@@ -186,6 +186,7 @@ class STO3G():
             print("      alpha = ", b["a"])
             print("      d = ", b["d"],'\n')
 
+
 class IO:
     """
     Prepare input file for Fortran program.
@@ -277,6 +278,8 @@ class IO:
             print("ERROR: This basis set is not implemented.")
             sys.exit(-1)
 
+        # TODO: Check that the number of electrons can be contained in the orbitals
+
     def fortran_input(self):
         self.ofile.write(self.calculation + os.linesep) # Calculation
         self.ofile.write(self.method + os.linesep) # Method
@@ -340,4 +343,4 @@ if __name__ == "__main__":
 
     os.system("./HF.x " + ffin) # Call Fortran Hartree-Fock program
 
-    #os.system("rm " + ffin) # Remove input for Fortran program
+    os.system("rm " + ffin) # Remove input for Fortran program
