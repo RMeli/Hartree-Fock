@@ -20,3 +20,5 @@ __pycache__/integrals2.cpython-34.pyc
 *.in
 
 *.in
+
+*.in~

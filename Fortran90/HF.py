@@ -62,7 +62,7 @@ class STO3G():
 
         # Exponential coefficients for the Gaussian orbitals
         self.zeta1 = {  "H":1.24,
-                        "He":2.0925,
+                        "He":1.6875,
                         "Li":2.69,
                         "Be":3.68,
                         "B":4.68,
